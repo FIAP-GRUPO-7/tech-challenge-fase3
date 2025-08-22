@@ -37,3 +37,14 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema
+Thumbs.db
+
+# Expo Shared
+.expo-shared/
+
