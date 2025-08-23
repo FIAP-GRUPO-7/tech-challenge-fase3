@@ -1,50 +1,150 @@
-# Welcome to your Expo app 👋
+🚀 Tech Challenge – Grupo 7 (FIAP) - Fase 3
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Projeto desenvolvido como parte do desafio técnico da Fase 3 do curso POSTECH.
+O foco desta fase é o desenvolvimento mobile utilizando React Native (com Expo), integrando Firebase para autenticação, armazenamento e gerenciamento de transações financeiras.
 
-## Get started
+📚 Sobre o Projeto
 
-1. Install dependencies
+Este projeto consiste em uma aplicação de gerenciamento financeiro, onde o usuário poderá:
 
-   ```bash
-   npm install
-   ```
+📊 Visualizar gráficos e análises financeiras em um Dashboard interativo.
 
-2. Start the app
+📋 Listar transações com filtros avançados (por data, categoria, etc.).
 
-   ```bash
-   npx expo start
-   ```
+🔄 Navegar com animações fluidas entre telas (utilizando React Native Animated / Reanimated).
 
-In the output, you'll find options to open the app in a
+➕ Adicionar e editar transações, com validação de campos.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+📤 Fazer upload de recibos/comprovantes para o Firebase Storage.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+🔑 Autenticar-se com Firebase Authentication (Login/Registro).
 
-## Get a fresh project
+🧑‍💻 Integrantes do Grupo 7
 
-When you're ready, run:
+Alexa Lins
 
-```bash
+Diego Costa
+
+Henrique Aguiar
+
+Kauane Gonçalves
+
+Manoel Meseque
+
+📁 Estrutura Geral do Projeto
+🔸 Repositório Mobile (Fase 3)
+
+Repositório: https://github.com/Sants-Coder/tech-challenge-fase3
+
+Estrutura principal:
+
+fase3-banco/
+ ├── app/                  # Telas e rotas (Expo Router)
+ │   ├── index.js          # Tela inicial
+ │   ├── login.js          # Tela de Login
+ │   ├── home.js           # Tela Home/Dashboard
+ │   └── transactions/     # CRUD de transações
+ │
+ ├── assets/               # Imagens, fontes, ícones
+ ├── components/           # Componentes reutilizáveis
+ ├── constants/            # Constantes globais (ex: paleta de cores)
+ ├── firebaseConfig.js     # Configuração do Firebase
+ ├── App.js                # Ponto de entrada (Expo Router)
+ └── ...
+
+🚀 Como Executar o Projeto Localmente
+
+Clone o repositório:
+
+git clone https://github.com/Sants-Coder/tech-challenge-fase3.git
+cd tech-challenge-fase3
+
+
+Instale as dependências:
+
+npm install
+
+
+Configure o Firebase:
+Crie um arquivo firebaseConfig.js na raiz com as credenciais do seu projeto Firebase:
+
+import { initializeApp } from "firebase/app";
+
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_DOMINIO.firebaseapp.com",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_BUCKET.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
+
+export const firebaseApp = initializeApp(firebaseConfig);
+
+
+Inicie o app:
+
+npx expo start
+
+
+📱 O app pode ser testado em:
+
+Expo Go (Android/iOS)
+
+Emulador Android
+
+Simulador iOS (apenas em macOS)
+
+Navegador Web
+
+🔐 Funcionalidades Principais
+
+Login e Autenticação → Firebase Auth
+
+Dashboard → Gráficos e animações
+
+Listagem de Transações → Filtros, paginação, busca no Firestore
+
+Adicionar/Editar Transação → Validação de campos
+
+Upload de Recibos → Firebase Storage
+
+📹 Entrega Final
+
+Além do código fonte, será entregue um vídeo de até 5 minutos demonstrando:
+
+Login e autenticação
+
+Adição/Edição de transações
+
+Visualização e filtros na listagem
+
+Upload de anexos/recibos
+
+Integração com Firebase
+
+🧪 Tecnologias e Ferramentas
+
+React Native 0.79+ (Expo SDK)
+
+Expo Router para navegação
+
+Firebase Authentication, Firestore, Storage
+
+Context API para gerenciamento de estado global
+
+React Native Reanimated / Animated para animações
+
+Chart Kit ou Victory Native para gráficos
+
+TypeScript
+
+⚙️ Scripts Principais
+# Instalar dependências
+npm install
+
+# Rodar no emulador Android / iOS / Web
+npx expo start
+
+# Resetar projeto
 npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
