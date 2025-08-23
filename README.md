@@ -36,27 +36,11 @@ Manoel Meseque
 
 Repositório: https://github.com/Sants-Coder/tech-challenge-fase3
 
-Estrutura principal:
-
-fase3-banco/
- ├── app/                  # Telas e rotas (Expo Router)
- │   ├── index.js          # Tela inicial
- │   ├── login.js          # Tela de Login
- │   ├── home.js           # Tela Home/Dashboard
- │   └── transactions/     # CRUD de transações
- │
- ├── assets/               # Imagens, fontes, ícones
- ├── components/           # Componentes reutilizáveis
- ├── constants/            # Constantes globais (ex: paleta de cores)
- ├── firebaseConfig.js     # Configuração do Firebase
- ├── App.js                # Ponto de entrada (Expo Router)
- └── ....
-
 🚀 Como Executar o Projeto Localmente
 
 Clone o repositório:
 
-git clone https://github.com/Sants-Coder/tech-challenge-fase3.git
+git clone https://github.com/FIAP-GRUPO-7/tech-challenge-fase3.git
 cd tech-challenge-fase3
 
 
