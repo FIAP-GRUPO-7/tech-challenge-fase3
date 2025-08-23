@@ -50,7 +50,7 @@ fase3-banco/
  ├── constants/            # Constantes globais (ex: paleta de cores)
  ├── firebaseConfig.js     # Configuração do Firebase
  ├── App.js                # Ponto de entrada (Expo Router)
- └── ...
+ └── ....
 
 🚀 Como Executar o Projeto Localmente
 
