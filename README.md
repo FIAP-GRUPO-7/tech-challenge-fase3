@@ -93,20 +93,6 @@ Adicionar/Editar Transação → Validação de campos
 
 Upload de Recibos → Firebase Storage
 
-📹 Entrega Final
-
-Além do código fonte, será entregue um vídeo de até 5 minutos demonstrando:
-
-Login e autenticação
-
-Adição/Edição de transações
-
-Visualização e filtros na listagem
-
-Upload de anexos/recibos
-
-Integração com Firebase
-
 🧪 Tecnologias e Ferramentas
 
 React Native 0.79+ (Expo SDK)
