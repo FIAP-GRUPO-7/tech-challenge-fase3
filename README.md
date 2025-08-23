@@ -34,7 +34,7 @@ Manoel Meseque
 📁 Estrutura Geral do Projeto
 🔸 Repositório Mobile (Fase 3)
 
-Repositório: https://github.com/Sants-Coder/tech-challenge-fase3
+Repositório: https://github.com/FIAP-GRUPO-7/tech-challenge-fase3
 
 🚀 Como Executar o Projeto Localmente
 
