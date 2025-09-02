@@ -39,8 +39,23 @@ Repositório: [https://github.com/FIAP-GRUPO-7/tech-challenge-fase3](https://git
 
 1. Clone o repositório:
 
+<<<<<<< HEAD
 ```bash
 git clone https://github.com/FIAP-GRUPO-7/tech-challenge-fase3.git cd tech-challenge-fase3
+=======
+Manoel Meseque
+
+📁 Estrutura Geral do Projeto
+🔸 Repositório Mobile (Fase 3)
+
+Repositório: https://github.com/FIAP-GRUPO-7/tech-challenge-fase3
+
+🚀 Como Executar o Projeto Localmente
+
+Clone o repositório:
+
+git clone https://github.com/FIAP-GRUPO-7/tech-challenge-fase3.git
+>>>>>>> 67d4a12e9f10a005284424ce431bba438f2289de
 cd tech-challenge-fase3
 ```
 
@@ -114,11 +129,31 @@ Além do código fonte, será entregue um **vídeo de até 5 minutos** demonstra
 - **Chart Kit ou Victory Native** para gráficos  
 - **TypeScript**  
 
+<<<<<<< HEAD
 ---
 
 ## ⚙️ Scripts Principais
 
 ```bash
+=======
+🧪 Tecnologias e Ferramentas
+
+React Native 0.79+ (Expo SDK)
+
+Expo Router para navegação
+
+Firebase Authentication, Firestore, Storage
+
+Context API para gerenciamento de estado global
+
+React Native Reanimated / Animated para animações
+
+Chart Kit ou Victory Native para gráficos
+
+TypeScript
+
+⚙️ Scripts Principais
+>>>>>>> 67d4a12e9f10a005284424ce431bba438f2289de
 # Instalar dependências
 npm install
 
@@ -127,4 +162,7 @@ npx expo start
 
 # Resetar projeto
 npm run reset-project
+<<<<<<< HEAD
 ```
+=======
+>>>>>>> 67d4a12e9f10a005284424ce431bba438f2289de

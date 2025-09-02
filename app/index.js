@@ -1,13 +1,20 @@
-import { View, Text, Button } from "react-native";
-import { Link } from "expo-router";
+import { useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Index() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Bem-vindo ao Banco!</Text>
-      <Link href="/login" asChild>
-        <Button title="Ir para Login" />
-      </Link>
-    </View>
-  );
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        router.replace('/Home'); 
+      } else {
+        router.replace('/Login'); 
+      }
+    }
+  }, [user, loading]);
+
+  return null; 
 }
