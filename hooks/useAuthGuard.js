@@ -1,20 +1,14 @@
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "../firebaseConfig";
+import { useAuth } from "./useAuth";
 
-export default function useAuthGuard() {
+export function useAuthGuard() {
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const auth = getAuth(app);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        
-        router.replace("/Login");
-      }
-    });
-
-    return unsubscribe;
-  }, []);
+    if (!loading && !user) {
+      router.replace("/Login");
+    }
+  }, [user, loading, router]);
 }
