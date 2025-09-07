@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import { registerUser, loginUser } from "../authService"; 
+import { registerUser, loginUser } from "../authService";
+import { styles } from "../styles/LoginStyles";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,7 +11,6 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-
 
   const validateFields = () => {
     if (!email || !password) {
@@ -51,23 +51,14 @@ export default function Login() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#f1f5f9" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
-        Login
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
 
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 8,
-          padding: 12,
-          marginBottom: 12,
-          backgroundColor: "#fff",
-        }}
+        style={styles.input}
         autoCapitalize="none"
       />
 
@@ -76,36 +67,21 @@ export default function Login() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 8,
-          padding: 12,
-          marginBottom: 12,
-          backgroundColor: "#fff",
-        }}
+        style={styles.input}
       />
 
-      {error ? <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text> : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       {loading ? (
-        <ActivityIndicator size="large" color="#2563eb" style={{ marginBottom: 12 }} />
+        <ActivityIndicator size="large" color="#2563EB" style={styles.loader} />
       ) : (
         <>
-          <TouchableOpacity
-            onPress={handleLogin}
-            style={{ backgroundColor: "#2563eb", padding: 15, borderRadius: 8, marginBottom: 10 }}
-          >
-            <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>Entrar</Text>
+          <TouchableOpacity onPress={handleLogin} style={[styles.button, styles.loginButton]}>
+            <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleSignup}
-            style={{ backgroundColor: "#16a34a", padding: 15, borderRadius: 8 }}
-          >
-            <Text style={{ color: "#fff", textAlign: "center", fontWeight: "bold" }}>
-              Criar Conta
-            </Text>
+          <TouchableOpacity onPress={handleSignup} style={[styles.button, styles.signupButton]}>
+            <Text style={styles.buttonText}>Criar Conta</Text>
           </TouchableOpacity>
         </>
       )}

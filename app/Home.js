@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthGuard } from "../hooks/useAuthGuard";
-import { styles } from "../styles/HomeStyles"; // importe o styles
+import { styles } from "../styles/HomeStyles";
 
 export default function Home() {
   useAuthGuard();
@@ -29,13 +29,15 @@ export default function Home() {
           )}
         </View>
 
-        {/* Main Content */}
+        {/* Main content */}
         <ScrollView style={styles.mainContent}>
-          {/* Cartão de saldo */}
+          {/* Card de saldo */}
           <View style={styles.card}>
             <Text style={styles.cardText}>Saldo</Text>
             <Text style={styles.cardAmount}>R$ 2.500,00</Text>
-            <Text style={{ color: "#93C5FD", marginTop: 4 }}>Conta Corrente</Text>
+            <Text style={{ color: "#93C5FD", marginTop: 4 }}>
+              Conta Corrente
+            </Text>
           </View>
 
           {/* Atalhos */}
@@ -48,7 +50,83 @@ export default function Home() {
               )
             )}
           </View>
+
+          {/* Resumo financeiro */}
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>Saldo Inicial</Text>
+              <Text style={styles.summaryValue}>R$ 5.000,00</Text>
+            </View>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>Entradas</Text>
+              <Text style={[styles.summaryValue, { color: "#16A34A" }]}>
+                R$ 1.300,00
+              </Text>
+            </View>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>Saídas</Text>
+              <Text style={[styles.summaryValue, { color: "#DC2626" }]}>
+                R$ 2.200,00
+              </Text>
+            </View>
+          </View>
+
+          {/* Transações recentes */}
+          <View style={styles.summaryCard}>
+            <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
+              Transações recentes
+            </Text>
+            {[
+              { desc: "Depósito", value: "+R$ 500", color: "#16A34A" },
+              { desc: "Compra", value: "-R$ 120", color: "#DC2626" },
+              { desc: "Assinatura", value: "-R$ 40", color: "#DC2626" },
+            ].map((item, idx) => (
+              <View
+                key={idx}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#F3F4F6",
+                  paddingVertical: 8,
+                }}
+              >
+                <Text>{item.desc}</Text>
+                <Text style={{ fontWeight: "700", color: item.color }}>
+                  {item.value}
+                </Text>
+              </View>
+            ))}
+          </View>
         </ScrollView>
+
+        {/* Extrato lateral */}
+        <View style={styles.sidebar}>
+          <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
+            Extrato
+          </Text>
+          {[
+            { desc: "Depósito", value: "+R$ 150", color: "#16A34A" },
+            { desc: "Depósito", value: "+R$ 100", color: "#16A34A" },
+            { desc: "Transferência", value: "-R$ 500", color: "#DC2626" },
+          ].map((item, idx) => (
+            <View
+              key={idx}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                borderBottomWidth: 1,
+                borderBottomColor: "#F3F4F6",
+                paddingVertical: 8,
+              }}
+            >
+              <Text>{item.desc}</Text>
+              <Text style={{ fontWeight: "700", color: item.color }}>
+                {item.value}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );

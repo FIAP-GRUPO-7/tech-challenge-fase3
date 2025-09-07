@@ -3,8 +3,9 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F4F6", 
+    backgroundColor: "#F3F4F6",
   },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -28,8 +29,9 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "700",
   },
+
   sidebar: {
-    width: "20%",
+    width: "25%",          
     backgroundColor: "#FFFFFF",
     borderRightWidth: 1,
     borderRightColor: "#E5E7EB",
@@ -44,10 +46,12 @@ export const styles = StyleSheet.create({
     color: "#374151",
     fontWeight: "500",
   },
+
   mainContent: {
     flex: 1,
     padding: 16,
   },
+
   card: {
     backgroundColor: "#1E40AF",
     borderRadius: 16,
@@ -68,41 +72,52 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 8,
   },
+
+
   shortcutsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    gap: 12,
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   shortcut: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: "#BFDBFE",
     justifyContent: "center",
     alignItems: "center",
   },
   shortcutText: {
     fontSize: 12,
-    color: "#1E3A8A", 
+    color: "#1E3A8A",
     textAlign: "center",
+  },
+
+  summaryRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
   },
   summaryCard: {
     flex: 1,
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 12,
-    marginHorizontal: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 1,
   },
   summaryLabel: {
-    color: "#6B7280", 
+    color: "#6B7280",
+    marginBottom: 4,
   },
   summaryValue: {
-    color: "#111827", 
+    color: "#111827",
     fontWeight: "700",
+    fontSize: 16,
   },
 });
