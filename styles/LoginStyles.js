@@ -1,52 +1,53 @@
+// styles/LoginStyles.js
 import { StyleSheet } from "react-native";
+import { colors, spacing, fontSize, radius } from "./theme";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#F1F5F9",
+    padding: spacing.xl,
+    backgroundColor: colors.background,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 24,
+    fontSize: fontSize.xl,
+    fontWeight: "bold",
+    marginBottom: spacing.xl,
     textAlign: "center",
-    color: "#111827", 
+    color: colors.text.primary,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 14,
-    backgroundColor: "#FFFFFF",
-    fontSize: 16,
+    borderColor: colors.text.muted,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.text.white,
+    fontSize: fontSize.md,
   },
   errorText: {
-    color: "#DC2626",
-    marginBottom: 12,
+    color: colors.danger,
+    marginBottom: spacing.sm,
     textAlign: "center",
-    fontWeight: "500",
   },
   button: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 12,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "700",
-    fontSize: 16,
+    padding: spacing.lg,
+    borderRadius: radius.md,
+    marginBottom: spacing.md,
   },
   loginButton: {
-    backgroundColor: "#2563EB", 
+    backgroundColor: colors.secondary,
   },
   signupButton: {
-    backgroundColor: "#16A34A", 
+    backgroundColor: colors.accent,
+  },
+  buttonText: {
+    color: colors.text.white,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: fontSize.md,
   },
   loader: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
 });

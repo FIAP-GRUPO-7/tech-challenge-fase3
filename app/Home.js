@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 import { styles } from "../styles/HomeStyles";
+import { colors } from "../styles/theme";
 
 export default function Home() {
   useAuthGuard();
@@ -18,8 +19,8 @@ export default function Home() {
       </View>
 
       <View style={{ flex: 1, flexDirection: "row" }}>
-        {/* Sidebar */}
-        <View style={styles.sidebar}>
+        {/* Sidebar Left */}
+        <View style={styles.sidebarLeft}>
           {["Início", "Transferências", "Investimentos", "Outros serviços"].map(
             (item, index) => (
               <TouchableOpacity key={index} style={styles.sidebarItem}>
@@ -35,9 +36,7 @@ export default function Home() {
           <View style={styles.card}>
             <Text style={styles.cardText}>Saldo</Text>
             <Text style={styles.cardAmount}>R$ 2.500,00</Text>
-            <Text style={{ color: "#93C5FD", marginTop: 4 }}>
-              Conta Corrente
-            </Text>
+            <Text style={styles.cardSubtitle}>Conta Corrente</Text>
           </View>
 
           {/* Atalhos */}
@@ -59,13 +58,13 @@ export default function Home() {
             </View>
             <View style={styles.summaryCard}>
               <Text style={styles.summaryLabel}>Entradas</Text>
-              <Text style={[styles.summaryValue, { color: "#16A34A" }]}>
+              <Text style={[styles.summaryValue, { color: colors.success }]}>
                 R$ 1.300,00
               </Text>
             </View>
             <View style={styles.summaryCard}>
               <Text style={styles.summaryLabel}>Saídas</Text>
-              <Text style={[styles.summaryValue, { color: "#DC2626" }]}>
+              <Text style={[styles.summaryValue, { color: colors.danger }]}>
                 R$ 2.200,00
               </Text>
             </View>
@@ -73,26 +72,15 @@ export default function Home() {
 
           {/* Transações recentes */}
           <View style={styles.summaryCard}>
-            <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
-              Transações recentes
-            </Text>
+            <Text style={styles.transactionTitle}>Transações recentes</Text>
             {[
-              { desc: "Depósito", value: "+R$ 500", color: "#16A34A" },
-              { desc: "Compra", value: "-R$ 120", color: "#DC2626" },
-              { desc: "Assinatura", value: "-R$ 40", color: "#DC2626" },
+              { desc: "Depósito", value: "+R$ 500", color: colors.success },
+              { desc: "Compra", value: "-R$ 120", color: colors.danger },
+              { desc: "Assinatura", value: "-R$ 40", color: colors.danger },
             ].map((item, idx) => (
-              <View
-                key={idx}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  borderBottomWidth: 1,
-                  borderBottomColor: "#F3F4F6",
-                  paddingVertical: 8,
-                }}
-              >
+              <View key={idx} style={styles.transactionRow}>
                 <Text>{item.desc}</Text>
-                <Text style={{ fontWeight: "700", color: item.color }}>
+                <Text style={[styles.transactionValue, { color: item.color }]}>
                   {item.value}
                 </Text>
               </View>
@@ -100,28 +88,17 @@ export default function Home() {
           </View>
         </ScrollView>
 
-        {/* Extrato lateral */}
-        <View style={styles.sidebar}>
-          <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
-            Extrato
-          </Text>
+        {/* Sidebar Right (Extrato) */}
+        <View style={styles.sidebarRight}>
+          <Text style={styles.sidebarRightTitle}>Extrato</Text>
           {[
-            { desc: "Depósito", value: "+R$ 150", color: "#16A34A" },
-            { desc: "Depósito", value: "+R$ 100", color: "#16A34A" },
-            { desc: "Transferência", value: "-R$ 500", color: "#DC2626" },
+            { desc: "Depósito", value: "+R$ 150", color: colors.success },
+            { desc: "Depósito", value: "+R$ 100", color: colors.success },
+            { desc: "Transferência", value: "-R$ 500", color: colors.danger },
           ].map((item, idx) => (
-            <View
-              key={idx}
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                borderBottomWidth: 1,
-                borderBottomColor: "#F3F4F6",
-                paddingVertical: 8,
-              }}
-            >
+            <View key={idx} style={styles.sidebarRightRow}>
               <Text>{item.desc}</Text>
-              <Text style={{ fontWeight: "700", color: item.color }}>
+              <Text style={[styles.sidebarRightValue, { color: item.color }]}>
                 {item.value}
               </Text>
             </View>

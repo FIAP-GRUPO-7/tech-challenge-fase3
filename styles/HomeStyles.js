@@ -1,62 +1,96 @@
+// styles/HomeStyles.js
 import { StyleSheet } from "react-native";
+import { colors, spacing, radius, fontSize } from "./theme";
 
 export const styles = StyleSheet.create({
+  // Container principal
   container: {
     flex: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: colors.background,
   },
 
+  // Cabeçalho
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#1E3A8A",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   headerText: {
-    color: "#FFFFFF",
-    fontSize: 18,
+    color: colors.text.white,
+    fontSize: fontSize.lg,
     fontWeight: "600",
   },
   logoutButton: {
-    backgroundColor: "#DC2626",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    backgroundColor: colors.danger,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
   },
   logoutButtonText: {
-    color: "#FFFFFF",
+    color: colors.text.white,
     fontWeight: "700",
   },
 
-  sidebar: {
-    width: "25%",          
-    backgroundColor: "#FFFFFF",
+  // Sidebar esquerda (menu de navegação)
+  sidebarLeft: {
+    width: "20%",
+    backgroundColor: colors.text.white,
     borderRightWidth: 1,
-    borderRightColor: "#E5E7EB",
-    padding: 12,
+    borderRightColor: colors.background,
+    padding: spacing.md,
   },
   sidebarItem: {
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: colors.background,
   },
   sidebarItemText: {
-    color: "#374151",
+    color: colors.text.secondary,
     fontWeight: "500",
+    fontSize: fontSize.md,
   },
 
+  // Sidebar direita (extrato)
+  sidebarRight: {
+    width: "25%",
+    backgroundColor: colors.text.white,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.background,
+    padding: spacing.md,
+  },
+  sidebarRightTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: "600",
+    marginBottom: spacing.sm,
+    color: colors.text.primary,
+  },
+  sidebarRightRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background,
+    paddingVertical: spacing.sm,
+  },
+  sidebarRightValue: {
+    fontWeight: "700",
+    fontSize: fontSize.md,
+  },
+
+  // Conteúdo principal
   mainContent: {
     flex: 1,
-    padding: 16,
+    padding: spacing.lg,
   },
 
+  // Card de saldo / informações
   card: {
-    backgroundColor: "#1E40AF",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    backgroundColor: colors.secondary,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    marginBottom: spacing.lg,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -64,60 +98,85 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
   cardText: {
-    color: "#FFFFFF",
+    color: colors.text.white,
+    fontSize: fontSize.md,
+  },
+  cardSubtitle: {
+    color: "#93C5FD",
+    marginTop: 4,
+    fontSize: fontSize.sm,
   },
   cardAmount: {
-    color: "#FFFFFF",
-    fontSize: 24,
+    color: colors.text.white,
+    fontSize: fontSize.xl,
     fontWeight: "700",
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
 
-
+  // Atalhos / Quick Actions
   shortcutsContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    justifyContent: "space-between",
-    marginBottom: 16,
+    justifyContent: "space-around",
+    marginBottom: spacing.lg,
   },
   shortcut: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "#BFDBFE",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.accent + "33", // cor com transparência
     justifyContent: "center",
     alignItems: "center",
   },
   shortcutText: {
-    fontSize: 12,
-    color: "#1E3A8A",
+    fontSize: fontSize.sm,
+    color: colors.primary,
     textAlign: "center",
   },
 
+  // Resumo financeiro
   summaryRow: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
+    justifyContent: "space-between",
+    marginBottom: spacing.lg,
   },
   summaryCard: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: colors.text.white,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginHorizontal: spacing.sm,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 1,
   },
   summaryLabel: {
-    color: "#6B7280",
-    marginBottom: 4,
+    color: colors.text.muted,
+    fontSize: fontSize.sm,
   },
   summaryValue: {
-    color: "#111827",
+    color: colors.text.primary,
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: fontSize.md,
+  },
+
+  // Transações
+  transactionTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: "600",
+    marginBottom: spacing.sm,
+    color: colors.text.primary,
+  },
+  transactionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background,
+    paddingVertical: spacing.sm,
+  },
+  transactionValue: {
+    fontWeight: "700",
+    fontSize: fontSize.md,
   },
 });
