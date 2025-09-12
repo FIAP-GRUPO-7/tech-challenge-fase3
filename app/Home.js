@@ -19,7 +19,7 @@ export default function Home() {
       </View>
 
       <View style={{ flex: 1, flexDirection: "row" }}>
-        {/* Sidebar Left */}
+        {/* Sidebar esquerdo */}
         <View style={styles.sidebarLeft}>
           {["Início", "Transferências", "Investimentos", "Outros serviços"].map(
             (item, index) => (
@@ -88,7 +88,7 @@ export default function Home() {
           </View>
         </ScrollView>
 
-        {/* Sidebar Right (Extrato) */}
+        {/* Sidebar direito (Extrato) */}
         <View style={styles.sidebarRight}>
           <Text style={styles.sidebarRightTitle}>Extrato</Text>
           {[

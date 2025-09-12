@@ -1,15 +1,12 @@
-// styles/HomeStyles.js
 import { StyleSheet } from "react-native";
 import { colors, spacing, radius, fontSize } from "./theme";
 
 export const styles = StyleSheet.create({
-  // Container principal
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
 
-  // Cabeçalho
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -34,7 +31,6 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  // Sidebar esquerda (menu de navegação)
   sidebarLeft: {
     width: "20%",
     backgroundColor: colors.text.white,
@@ -53,7 +49,6 @@ export const styles = StyleSheet.create({
     fontSize: fontSize.md,
   },
 
-  // Sidebar direita (extrato)
   sidebarRight: {
     width: "25%",
     backgroundColor: colors.text.white,
@@ -79,13 +74,11 @@ export const styles = StyleSheet.create({
     fontSize: fontSize.md,
   },
 
-  // Conteúdo principal
   mainContent: {
     flex: 1,
     padding: spacing.lg,
   },
 
-  // Card de saldo / informações
   card: {
     backgroundColor: colors.secondary,
     borderRadius: radius.lg,
@@ -113,7 +106,6 @@ export const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
 
-  // Atalhos / Quick Actions
   shortcutsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -133,7 +125,6 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // Resumo financeiro
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -161,7 +152,6 @@ export const styles = StyleSheet.create({
     fontSize: fontSize.md,
   },
 
-  // Transações
   transactionTitle: {
     fontSize: fontSize.lg,
     fontWeight: "600",

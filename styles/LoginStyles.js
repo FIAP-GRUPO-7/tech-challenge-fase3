@@ -1,4 +1,3 @@
-// styles/LoginStyles.js
 import { StyleSheet } from "react-native";
 import { colors, spacing, fontSize, radius } from "./theme";
 
