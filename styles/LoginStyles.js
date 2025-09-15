@@ -9,13 +9,20 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   title: {
-    fontSize: fontSize.xl,
-    fontWeight: "bold",
+    fontSize: fontSize.xl + 4,
+    fontWeight: "700",
+    marginBottom: spacing.sm,
+    textAlign: "center",
+    color: colors.primary,
+  },
+  subtitle: {
+    fontSize: fontSize.md,
+    color: colors.text.muted,
     marginBottom: spacing.xl,
     textAlign: "center",
-    color: colors.text.primary,
   },
   input: {
+    width: "100%",
     borderWidth: 1,
     borderColor: colors.text.muted,
     borderRadius: radius.md,
@@ -30,6 +37,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
+    width: "100%",
     padding: spacing.lg,
     borderRadius: radius.md,
     marginBottom: spacing.md,

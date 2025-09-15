@@ -1,16 +1,17 @@
 export const colors = {
-  primary: "#1E3A8A",   // Azul principal
-  secondary: "#2563EB", // Azul mais claro
-  accent: "#16A34A",    // Verde
-  danger: "#DC2626",    // Vermelho
-  background: "#F3F4F6",// Cinza claro
+  primary: "#1F2937",   // Cinza grafite
+  secondary: "#3B82F6", // Azul moderno
+  accent: "#10B981",    // Verde discreto
+  danger: "#EF4444",    // Vermelho
+  background: "#FFFFFF",// Fundo branco limpo
   text: {
-    primary: "#111827",
-    secondary: "#374151",
-    muted: "#6B7280",
-    white: "#FFFFFF",
+    primary: "#111827",   // Preto suave
+    secondary: "#4B5563", // Cinza médio
+    muted: "#9CA3AF",     // Cinza claro
+    white: "#FFFFFF",     // Branco Puro
   },
 };
+
 
 export const spacing = {
   xs: 4,

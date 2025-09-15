@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
+  // Cabeçalho
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   headerText: {
     color: colors.text.white,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.sm,
     fontWeight: "600",
   },
   logoutButton: {
@@ -31,54 +32,13 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  sidebarLeft: {
-    width: "20%",
-    backgroundColor: colors.text.white,
-    borderRightWidth: 1,
-    borderRightColor: colors.background,
-    padding: spacing.md,
-  },
-  sidebarItem: {
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background,
-  },
-  sidebarItemText: {
-    color: colors.text.secondary,
-    fontWeight: "500",
-    fontSize: fontSize.md,
-  },
-
-  sidebarRight: {
-    width: "25%",
-    backgroundColor: colors.text.white,
-    borderLeftWidth: 1,
-    borderLeftColor: colors.background,
-    padding: spacing.md,
-  },
-  sidebarRightTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: "600",
-    marginBottom: spacing.sm,
-    color: colors.text.primary,
-  },
-  sidebarRightRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background,
-    paddingVertical: spacing.sm,
-  },
-  sidebarRightValue: {
-    fontWeight: "700",
-    fontSize: fontSize.md,
-  },
-
+  // Conteúdo principal
   mainContent: {
     flex: 1,
     padding: spacing.lg,
   },
 
+  // Card de saldo
   card: {
     backgroundColor: colors.secondary,
     borderRadius: radius.lg,
@@ -106,36 +66,42 @@ export const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
 
+  // Atalhos
   shortcutsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-around",
     marginBottom: spacing.lg,
   },
   shortcut: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.accent + "33", // cor com transparência
+    width: 48,
+    height: 48,
+    borderRadius: 36,
+    backgroundColor: colors.secondary,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: spacing.md,
   },
   shortcutText: {
-    fontSize: fontSize.sm,
-    color: colors.primary,
+    fontSize: 10,
+    color: colors.background,
     textAlign: "center",
   },
 
+  // Resumo financeiro
   summaryRow: {
     flexDirection: "row",
+    flexWrap: "wrap", 
     justifyContent: "space-between",
     marginBottom: spacing.lg,
   },
   summaryCard: {
     flex: 1,
+    minWidth: "45%",
     backgroundColor: colors.text.white,
     borderRadius: radius.md,
     padding: spacing.md,
-    marginHorizontal: spacing.sm,
+    margin: spacing.sm,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -149,9 +115,10 @@ export const styles = StyleSheet.create({
   summaryValue: {
     color: colors.text.primary,
     fontWeight: "700",
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
   },
 
+  // Transações recentes
   transactionTitle: {
     fontSize: fontSize.lg,
     fontWeight: "600",
