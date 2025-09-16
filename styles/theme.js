@@ -1,14 +1,17 @@
 export const colors = {
   primary: "#1F2937",   // Cinza grafite
-  secondary: "#3B82F6", // Azul moderno
+  secondary: "#4087F9", // Azul moderno
   accent: "#10B981",    // Verde discreto
-  danger: "#EF4444",    // Vermelho
+  danger: "#FF0000",    // Vermelho
   background: "#FFFFFF",// Fundo branco limpo
+  black: "#000000",// Preto padrão
+  cinza_claro: "#8E8E8E", //cinza para botões
   text: {
     primary: "#111827",   // Preto suave
     secondary: "#4B5563", // Cinza médio
     muted: "#9CA3AF",     // Cinza claro
     white: "#FFFFFF",     // Branco Puro
+    black: "#000000",     //Preto
   },
 };
 

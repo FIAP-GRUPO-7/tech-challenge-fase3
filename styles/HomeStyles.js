@@ -7,29 +7,65 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
-  // Cabeçalho
+  dropdownMenu: {
+    position: "absolute",
+    top: 50,
+    right: 16,
+    backgroundColor: colors.black,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    minWidth: 120,
+    zIndex: 1000,
+    elevation: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+
+  dropdownClose: {
+    alignSelf: "flex-end",
+  },
+  dropdownLogout: {
+    marginTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.text.muted,
+    paddingTop: spacing.sm,
+  },
+  dropdownLogoutText: {
+    color: colors.text.white,
+    fontWeight: "600",
+    fontSize: fontSize.sm,
+    textAlign: "center",
+  },
+
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 20,
+    marginRight: 10,   // espaço entre o avatar e o email
+  },
+
+  // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+    backgroundColor: colors.background,
+    position: "relative",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.text.muted + "33",
   },
   headerText: {
-    color: colors.text.white,
-    fontSize: fontSize.sm,
+    color: colors.text.primary,
+    fontSize: fontSize.md,
     fontWeight: "600",
   },
-  logoutButton: {
-    backgroundColor: colors.danger,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-  },
-  logoutButtonText: {
-    color: colors.text.white,
-    fontWeight: "700",
+  headerMenu: {
+    fontSize: fontSize.lg,
+    color: colors.text.primary,
   },
 
   // Conteúdo principal
@@ -44,18 +80,19 @@ export const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.xl,
     marginBottom: spacing.lg,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    zIndex: 1,
+  },
+  balanceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   cardText: {
     color: colors.text.white,
     fontSize: fontSize.md,
   },
   cardSubtitle: {
-    color: "#93C5FD",
+    color: "#DCEAFE",
     marginTop: 4,
     fontSize: fontSize.sm,
   },
@@ -65,75 +102,108 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: spacing.sm,
   },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 8,
+    resizeMode: 'contain',
+  },
+
 
   // Atalhos
   shortcutsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.lg,
     marginBottom: spacing.lg,
-  },
-  shortcut: {
-    width: 48,
-    height: 48,
-    borderRadius: 36,
-    backgroundColor: colors.secondary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: spacing.md,
-  },
-  shortcutText: {
-    fontSize: 10,
-    color: colors.background,
-    textAlign: "center",
   },
 
-  // Resumo financeiro
-  summaryRow: {
-    flexDirection: "row",
-    flexWrap: "wrap", 
-    justifyContent: "space-between",
-    marginBottom: spacing.lg,
+  shortcut: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  summaryCard: {
-    flex: 1,
-    minWidth: "45%",
-    backgroundColor: colors.text.white,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    margin: spacing.sm,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  summaryLabel: {
-    color: colors.text.muted,
+
+  shortcutText: {
+    color: colors.text.white,
     fontSize: fontSize.sm,
+    fontWeight: '600',
+    textAlign: 'center',
   },
-  summaryValue: {
-    color: colors.text.primary,
-    fontWeight: "700",
-    fontSize: fontSize.sm,
-  },
+
 
   // Transações recentes
-  transactionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: "600",
+  transactionsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: colors.secondary,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.sm,
     marginBottom: spacing.sm,
-    color: colors.text.primary,
   },
+
+  transactionsHeaderText: {
+    flex: 1,
+    textAlign: "center",
+    color: colors.text.white,
+    fontWeight: "600",
+  },
+
   transactionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background,
+    alignItems: "center",
     paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
   },
-  transactionValue: {
-    fontWeight: "700",
+
+  transactionText: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: fontSize.sm,
+    color: colors.text.primary,
+  },
+
+  transactionValuePositive: {
+    flex: 1,
+    textAlign: "center",
+    color: "green",
+    fontWeight: "600",
+  },
+
+  transactionValueNegative: {
+    flex: 1,
+    textAlign: "center",
+    color: "red",
+    fontWeight: "600",
+  },
+
+  transactionsContainer: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0", // borda quase imperceptível
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginVertical: spacing.md,
+    backgroundColor: "#fff", // garante contraste caso o fundo seja cinza
+  },
+
+  transactionsTitle: {
     fontSize: fontSize.md,
+    fontWeight: "800", // negrito
+    marginBottom: spacing.sm,
+    color: colors.text.primary,
   },
+
+  viewAllText: {
+    fontSize: fontSize.sm,
+    fontWeight: "600",
+    color: colors.primary,
+    marginTop: spacing.sm,
+  },
+
 });
