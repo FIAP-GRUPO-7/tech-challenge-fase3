@@ -32,7 +32,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
 
-  // Buscar transações do usuário
+  // Buscar transações da pessoa
   useEffect(() => {
     if (!user?.uid) {
       setTransactions([]);
@@ -77,7 +77,7 @@ export default function Home() {
     [router]
   );
 
-  // 🔹 Função que renderiza cada linha da transação
+  //  Função de cada linha da transação
   const renderTx = ({ item }) => {
     const valueColor = item.value >= 0 ? colors.accent : colors.danger;
     const displayValue =
@@ -123,7 +123,7 @@ export default function Home() {
         </View>
       )}
 
-      {/* Header */}
+      {/* Cabeçalho */}
       <View style={styles.header}>
         {/* Avatar + Texto */}
         <View style={{ flexDirection: "row", alignItems: "center" }}>

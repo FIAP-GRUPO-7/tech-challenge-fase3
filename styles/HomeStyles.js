@@ -35,6 +35,7 @@ export const styles = StyleSheet.create({
   dropdownLogoutText: {
     color: colors.text.white,
     fontWeight: "600",
+    
     fontSize: fontSize.sm,
     textAlign: "center",
   },
@@ -43,7 +44,7 @@ export const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 20,
-    marginRight: 10,   // espaço entre o avatar e o email
+    marginRight: 10,
   },
 
   // Header
@@ -185,16 +186,16 @@ export const styles = StyleSheet.create({
 
   transactionsContainer: {
     borderWidth: 1,
-    borderColor: "#E0E0E0", // borda quase imperceptível
+    borderColor: "#E0E0E0",
     borderRadius: radius.sm,
     padding: spacing.md,
     marginVertical: spacing.md,
-    backgroundColor: "#fff", // garante contraste caso o fundo seja cinza
+    backgroundColor: "#fff", 
   },
 
   transactionsTitle: {
     fontSize: fontSize.md,
-    fontWeight: "800", // negrito
+    fontWeight: "800",
     marginBottom: spacing.sm,
     color: colors.text.primary,
   },
