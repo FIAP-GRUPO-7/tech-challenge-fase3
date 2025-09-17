@@ -102,6 +102,13 @@ npx expo start
 
 ---
 
+## Link do Design System
+
+```bash
+https://www.figma.com/design/ULceZeAR4otGhLXf684Tvo/P%C3%B3sTech-Fase3?node-id=0-1&t=PtnS5sskQRlU3ohO-1
+```
+---
+
 ## 📹 Entrega Final  
 
 Além do código fonte, será entregue um **vídeo de até 5 minutos** demonstrando:  
