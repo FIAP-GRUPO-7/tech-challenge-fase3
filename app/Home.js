@@ -160,7 +160,7 @@ export default function Home() {
 
         {/* Atalhos */}
         <View style={styles.shortcutsContainer}>
-          {["Pix", "Transferir", "Investir"].map((item, idx) => (
+          {["Pix", "Transfe", "Investir"].map((item, idx) => (
             <TouchableOpacity
               key={idx}
               style={styles.shortcut}

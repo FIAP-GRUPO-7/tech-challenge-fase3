@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
   dropdownLogoutText: {
     color: colors.text.white,
     fontWeight: "600",
-    
+
     fontSize: fontSize.sm,
     textAlign: "center",
   },
@@ -120,8 +120,8 @@ export const styles = StyleSheet.create({
   },
 
   shortcut: {
-    width: 64,
-    height: 64,
+    width: 54,
+    height: 54,
     borderRadius: 32,
     backgroundColor: colors.secondary,
     justifyContent: 'center',
@@ -138,12 +138,35 @@ export const styles = StyleSheet.create({
 
 
   // Transações recentes
+
+  summaryCard: {
+    flex: 1,
+    minWidth: "45%",
+    backgroundColor: colors.text.white,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    margin: spacing.sm,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+
+
   transactionsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: colors.secondary,
     paddingVertical: spacing.sm,
     borderRadius: radius.sm,
+    marginBottom: spacing.sm,
+  },
+
+  transactionTitle: {
+    fontWeight: "600",
     marginBottom: spacing.sm,
   },
 
@@ -190,7 +213,7 @@ export const styles = StyleSheet.create({
     borderRadius: radius.sm,
     padding: spacing.md,
     marginVertical: spacing.md,
-    backgroundColor: "#fff", 
+    backgroundColor: "#fff",
   },
 
   transactionsTitle: {
@@ -206,5 +229,14 @@ export const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: spacing.sm,
   },
+
+  seeAllText: {
+    fontSize: fontSize.sm,
+    fontWeight: "600",
+    color: colors.black,
+    marginTop: spacing.sm,
+    textDecorationLine: "underline"
+  },
+
 
 });
