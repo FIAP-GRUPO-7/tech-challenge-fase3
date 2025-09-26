@@ -24,30 +24,27 @@ export default function Login() {
     return true;
   };
 
+  // No seu login.js
   const handleLogin = async () => {
-    if (!validateFields()) return;
-    setLoading(true);
-    setError("");
+    // ...
     try {
       await loginUser(email, password);
-      router.replace("/Home");
+      // Rota corrigida
+      router.replace("/tabs/Home");
     } catch (err) {
-      setError("Erro ao fazer login: " + err.message);
+      // ...
     }
-    setLoading(false);
   };
 
   const handleSignup = async () => {
-    if (!validateFields()) return;
-    setLoading(true);
-    setError("");
+    // ...
     try {
       await registerUser(email, password);
-      router.replace("/Home");
+      // Rota corrigida
+      router.replace("/tabs/Home");
     } catch (err) {
-      setError("Erro ao criar conta: " + err.message);
+      // ...
     }
-    setLoading(false);
   };
 
   return (

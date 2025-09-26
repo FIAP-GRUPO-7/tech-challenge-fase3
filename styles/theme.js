@@ -13,6 +13,13 @@ export const colors = {
     white: "#FFFFFF",     // Branco Puro
     black: "#000000",     //Preto
   },
+
+  tabBar: {
+    container: "#4087F9", // Azul primário (secondary) para a caixa flutuante
+    activeIconBackground: "#1F2937", // Fundo do ícone ativo (Branco)
+    activeIcon: "#ffffff",           // Cor do ícone ativo (Preto)
+    inactiveIcon: "#ffffff",         // Cor do ícone inativo (Branco)
+  }
 };
 
 
