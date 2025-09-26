@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AvatarImg from "../assets/images/Avatar.png";
 import OcultarSaldoIcon from "../assets/images/ocultar-saldo-branco.png";
-import { Image } from "react-native";
 
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  ScrollView,
   Text,
   TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-  Alert,
+  View,
 } from "react-native";
+
 import { useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthGuard } from "../hooks/useAuthGuard";
@@ -19,8 +20,16 @@ import { styles } from "../styles/HomeStyles";
 import { colors } from "../styles/theme";
 
 // Firestore
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { Button } from "react-native-web";
 import { db } from "../firebaseConfig";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { realizarDeposito } from "../services/transactionService";
 
 export default function Home() {
   useAuthGuard();
@@ -41,7 +50,7 @@ export default function Home() {
     }
 
     const q = query(
-      collection(db, "transactions"),
+      collection(db, "transacoes"),
       where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
@@ -76,6 +85,10 @@ export default function Home() {
     },
     [router]
   );
+
+  const handleClick = async () => {
+    realizarDeposito(4.0, user.uid);
+  };
 
   //  Função de cada linha da transação
   const renderTx = ({ item }) => {
@@ -151,6 +164,7 @@ export default function Home() {
                 {showBalance ? "R$ 2.500,00" : "******"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
+              <Button onPress={() => handleClick()}></Button>
             </View>
             <TouchableOpacity onPress={() => setShowBalance((s) => !s)}>
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />

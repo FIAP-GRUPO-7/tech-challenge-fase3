@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import { registerUser, loginUser } from "../authService";
+import { useState } from "react";
+import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { loginUser, registerUser } from "../services/authService";
 import { styles } from "../styles/LoginStyles";
 
 export default function Login() {
@@ -43,7 +43,7 @@ export default function Login() {
     setError("");
     try {
       await registerUser(email, password);
-      router.replace("/Home");
+      //router.replace("/Home");
     } catch (err) {
       setError("Erro ao criar conta: " + err.message);
     }
