@@ -7,6 +7,7 @@ import {
   Alert,
   FlatList,
   Image,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -27,9 +28,14 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { Button } from "react-native-web";
 import { db } from "../firebaseConfig";
 import { realizarDeposito } from "../services/transactionService";
+import {
+  downloadFileToLocal,
+  uploadFileFromUri,
+} from "../services/storageService";
+import Button from "../components/ui/Button";
+import FileUploaderComponent from "../components/ui/FileUploaderComponent"; 
 
 export default function Home() {
   useAuthGuard();
@@ -87,8 +93,51 @@ export default function Home() {
   );
 
   const handleClick = async () => {
-    realizarDeposito(4.0, user.uid);
+    await realizarDeposito(4.0, user.uid);
   };
+  //const handleClick2 = async () => {
+  //  await uploadFileFromUri(
+  //    "tech-challenge-fase3/services/exemplo.pdf",
+  //    "exemplo.pdf",
+  //    user.uid
+  //  );
+  //  await uploadFileFromUri(
+  //    "tech-challenge-fase3/services/foto.jpg",
+  //    "exemplo.pdf",
+  //    user.uid
+  //  );
+  //  await uploadFileFromUri(
+  //    "tech-challenge-fase3/services/imagem.png",
+  //    "exemplo.pdf",
+  //    user.uid
+  //  );
+  //};
+  //const handleClick3 = async () => {
+  //  await downloadFileToLocal(
+  //    `comprovantes/${user.id}/exemplo.pdf`,
+  //    `tech-challenge-fase3/services/download`
+  //  );
+  //  await downloadFileToLocal(
+  //    `comprovantes/${user.id}/foto.jpg`,
+  //    `tech-challenge-fase3/services/download`
+  //  );
+  //  await downloadFileToLocal(
+  //    `comprovantes/${user.id}/imagem.png`,
+  //    `tech-challenge-fase3/services/download`
+  //  );
+  //};
+
+  const handleDownloadClick = () => {
+      if (Platform.OS === "web") {
+        alert(
+          "No ambiente web, os downloads geralmente ocorrem clicando diretamente na URL do arquivo (ex: a URL que você obtém após o upload)."
+        );
+      } else {
+        alert(
+          "No ambiente mobile, use 'expo-file-system' para baixar arquivos de URLs para o dispositivo."
+        );
+      }
+    };
 
   //  Função de cada linha da transação
   const renderTx = ({ item }) => {
@@ -164,7 +213,19 @@ export default function Home() {
                 {showBalance ? "R$ 2.500,00" : "******"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
-              <Button onPress={() => handleClick()}></Button>
+              <Button title={'TESTE TRANSAÇÃO'} onPress={() => handleClick()}>
+              </Button>
+              {/* Novo componente de upload */}
+              {user && <FileUploaderComponent user={user} />}
+              {!user && (
+                <Text style={{ color: colors.danger, marginTop: 10 }}>
+                  Faça login para gerenciar arquivos.
+                </Text>
+              )}
+              <Button
+                title={"TESTE DOWNLOAD ARQUIVO"}
+                onPress={() => handleDownloadClick()}
+              />
             </View>
             <TouchableOpacity onPress={() => setShowBalance((s) => !s)}>
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />
