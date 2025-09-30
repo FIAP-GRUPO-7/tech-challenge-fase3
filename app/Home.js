@@ -1,26 +1,26 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Image } from "react-native";
 import AvatarImg from "../assets/images/Avatar.png";
 import OcultarSaldoIcon from "../assets/images/ocultar-saldo-branco.png";
-import { Image } from "react-native";
 
+import { useRouter } from "expo-router";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  ScrollView,
   Text,
   TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-  Alert,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 import { styles } from "../styles/HomeStyles";
 import { colors } from "../styles/theme";
 
 // Firestore
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 
 export default function Home() {
   useAuthGuard();
@@ -66,16 +66,18 @@ export default function Home() {
     return () => unsubscribe();
   }, [user]);
 
-  const handleShortcutPress = useCallback(
-    (key) => {
-      if (key === "Transferir") router.push("/add-transaction");
-      else if (key === "Pix") router.push("/add-transaction?type=pix");
-      else if (key === "Pagar") router.push("/add-transaction?type=payment");
-      else if (key === "Comprovantes") router.push("/comprovantes");
-      else router.push("/transactions");
+    const handleShortcutPress = useCallback(
+      (key) => {
+        if (key === "Transferir") router.push("/Transfer");
+        else if (key === "Pix") router.push("/AddTransactions?type=pix");
+        else if (key === "Pagar") router.push("/AddTransactions?type=payment");
+        else if (key === "Investir") router.push("/AddTransactions?type=investiment")
+        else if (key === "Comprovantes") router.push("/comprovantes");
+        else router.push("/Transactions");
     },
     [router]
   );
+
 
   //  Função de cada linha da transação
   const renderTx = ({ item }) => {
@@ -160,7 +162,7 @@ export default function Home() {
 
         {/* Atalhos */}
         <View style={styles.shortcutsContainer}>
-          {["Pix", "Transfe", "Investir"].map((item, idx) => (
+          {["Pix", "Transferir", "Investir"].map((item, idx) => (
             <TouchableOpacity
               key={idx}
               style={styles.shortcut}
@@ -197,7 +199,7 @@ export default function Home() {
 
           <TouchableOpacity
             style={styles.seeAllButton}
-            onPress={() => router.push("/transactions")}
+            onPress={() => router.push("/Transactions")}
           >
             <Text style={styles.seeAllText}>Ver todas as transações</Text>
           </TouchableOpacity>
