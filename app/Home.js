@@ -28,14 +28,10 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import Button from "../components/ui/Button";
+import FileUploaderComponent from "../components/ui/FileUploaderComponent";
 import { db } from "../firebaseConfig";
 import { realizarDeposito } from "../services/transactionService";
-import {
-  downloadFileToLocal,
-  uploadFileFromUri,
-} from "../services/storageService";
-import Button from "../components/ui/Button";
-import FileUploaderComponent from "../components/ui/FileUploaderComponent"; 
 
 export default function Home() {
   useAuthGuard();
