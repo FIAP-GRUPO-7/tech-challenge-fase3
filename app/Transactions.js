@@ -1,8 +1,10 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from "expo-router";
-import { useMemo, useRef, useState } from "react";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     ActivityIndicator,
+    Alert,
     FlatList,
     Image,
     Modal,
@@ -12,6 +14,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import { db } from "../firebaseConfig";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
@@ -19,15 +22,12 @@ import { colors, fontSize, radius, spacing } from "../styles/theme";
 import AvatarImg from "../assets/images/Avatar.png";
 import { styles as homeStyles } from "../styles/HomeStyles";
 
-const HomeIcon = () => <Text style={styles.navIcon}>🏠</Text>;
-const ListIcon = () => <Text style={styles.navIconActive}>📄</Text>;
-const AddIcon = () => <Text style={styles.navIcon}>➕</Text>;
-
 const CATEGORIAS = ["Compras", "Salário", "Transporte"];
 const TIPOS = ["Todos", "Entradas", "Saídas"];
 
 const CustomDropdown = ({ isVisible, options, onSelect, onClose, buttonLayout }) => {
     if (!isVisible || !buttonLayout) return null;
+
     const dropdownStyle = {
         position: 'absolute',
         top: buttonLayout.py + buttonLayout.height + 5,
@@ -72,7 +72,7 @@ export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedType, setSelectedType] = useState("Todos");
+  const [selectedType, setSelectedType] = useState("Tipo");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [categoryDropdownVisible, setCategoryDropdownVisible] = useState(false);
@@ -84,6 +84,30 @@ export default function Transactions() {
   const categoryButtonRef = useRef(null);
   const typeButtonRef = useRef(null);
   
+  useEffect(() => {
+    if (!user?.uid) {
+        setLoading(false);
+        return;
+    }
+    const q = query(
+      collection(db, "transactions"), 
+      where("userId", "==", user.uid), 
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setAllTransactions(items);
+      setLoading(false);
+    }, (err) => {
+      console.error("Erro ao buscar transações:", err);
+      Alert.alert("Erro", "Não foi possível carregar os dados.");
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
   const filteredTransactions = useMemo(() => {
     let transactions = [...allTransactions];
     if (searchQuery) { transactions = transactions.filter(t => (t.type?.toLowerCase().includes(searchQuery.toLowerCase())) || (t.recipient?.toLowerCase().includes(searchQuery.toLowerCase()))); }
@@ -94,31 +118,32 @@ export default function Transactions() {
     return transactions;
   }, [allTransactions, searchQuery, selectedType, selectedCategory, selectedDate]);
 
-  // --- FUNÇÃO CORRIGIDA ---
+
   const onDateChange = (event, date) => {
-    // Sempre fechar o seletor de data após uma ação (selecionar ou cancelar)
     setShowDatePicker(false);
-    
-    // Apenas atualiza a data se o usuário confirmou a seleção ('set')
     if (event.type === 'set' && date) {
       setSelectedDate(date);
     }
   };
 
   const handleCategoryPress = () => {
-    categoryButtonRef.current.measure((fx, fy, width, height, px, py) => {
-        setCategoryButtonLayout({ px, py, width, height });
-        setTypeDropdownVisible(false);
-        setCategoryDropdownVisible(v => !v);
-    });
+    if (categoryButtonRef.current) {
+        categoryButtonRef.current.measure((fx, fy, width, height, px, py) => {
+            setCategoryButtonLayout({ px, py, width, height });
+            setTypeDropdownVisible(false);
+            setCategoryDropdownVisible(v => !v);
+        });
+    }
   };
 
   const handleTypePress = () => {
-    typeButtonRef.current.measure((fx, fy, width, height, px, py) => {
-        setTypeButtonLayout({ px, py, width, height });
-        setCategoryDropdownVisible(false);
-        setTypeDropdownVisible(v => !v);
-    });
+    if (typeButtonRef.current) {
+        typeButtonRef.current.measure((fx, fy, width, height, px, py) => {
+            setTypeButtonLayout({ px, py, width, height });
+            setCategoryDropdownVisible(false);
+            setTypeDropdownVisible(v => !v);
+        });
+    }
   };
   
   const renderTx = ({ item }) => {
@@ -209,42 +234,38 @@ export default function Transactions() {
                 keyExtractor={(t) => t.id}
                 renderItem={renderTx}
                 ListHeaderComponent={ListHeader}
-                ListFooterComponent={() => (
-                    <TouchableOpacity style={styles.loadMoreButton}>
-                        <Text style={styles.loadMoreText}>Carregar mais</Text>
-                    </TouchableOpacity>
-                )}
-                contentContainerStyle={{ paddingHorizontal: spacing.sm }}
+                contentContainerStyle={{ paddingHorizontal: spacing.sm, flexGrow: 1 }}
             /> 
         )}
       </View>
-      
+
       <CustomDropdown 
         isVisible={categoryDropdownVisible}
         options={CATEGORIAS}
         onSelect={(option) => { setSelectedCategory(option); setCategoryDropdownVisible(false); }}
         onClose={() => setCategoryDropdownVisible(false)}
-        buttonLayout={categoryButtonLayout.current}
+        buttonLayout={categoryButtonLayout}
       />
       <CustomDropdown 
         isVisible={typeDropdownVisible}
         options={TIPOS}
         onSelect={(option) => { setSelectedType(option); setTypeDropdownVisible(false); }}
         onClose={() => setTypeDropdownVisible(false)}
-        buttonLayout={typeButtonLayout.current}
+        buttonLayout={typeButtonLayout}
       />
       
-      <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navButton} onPress={() => router.replace('/Home')}><HomeIcon /></TouchableOpacity>
-          <TouchableOpacity style={[styles.navButton, styles.navButtonActive]}><ListIcon /></TouchableOpacity>
-          <TouchableOpacity style={styles.navButton} onPress={() => router.push('/Transfer')}><AddIcon /></TouchableOpacity>
+      {/* BOTÃO "CARREGAR MAIS" POSICIONADO NO LUGAR DA TABBAR */}
+      <View style={styles.footer}>
+        <TouchableOpacity>
+            <Text style={styles.loadMoreText}>Carregar mais</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    content: { flex: 1, paddingHorizontal: spacing.md, backgroundColor: '#fff' },
+    content: { flex: 1, paddingHorizontal: spacing.md, backgroundColor: '#fff', marginBottom: 60 }, // Adicionado marginBottom
     pageHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.md, },
     pageTitle: { fontSize: fontSize.lg, fontWeight: "600", },
     backButton: { fontSize: 30, fontWeight: '300', },
@@ -261,18 +282,26 @@ const styles = StyleSheet.create({
     listHeaderText: { flex: 1, textAlign: 'center', fontWeight: 'bold', color: colors.text.muted, fontSize: fontSize.sm, },
     transactionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: '#F3F4F6', },
     tableCell: { flex: 1, textAlign: 'center', color: colors.text.secondary, fontSize: fontSize.sm, },
-    loadMoreButton: { padding: spacing.lg, alignItems: 'center', },
-    loadMoreText: { color: colors.secondary, fontWeight: '600', textDecorationLine: 'underline' },
-    bottomNav: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: '#E5E7EB', borderRadius: 50, marginHorizontal: 60, marginBottom: 20, paddingVertical: 8, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, },
-    navButton: { padding: 10, },
-    navButtonActive: { backgroundColor: colors.secondary, borderRadius: 20, },
-    navIcon: { fontSize: 24, color: '#4B5563' },
-    navIconActive: { fontSize: 24, color: '#fff' },
     dropdownItem: {
         padding: spacing.md,
     },
     dropdownItemText: {
         color: colors.text.white,
         fontSize: fontSize.md,
-    }
+    },
+    // --- ESTILOS NOVOS E AJUSTADOS ---
+    footer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingVertical: spacing.xl,
+        alignItems: 'center',
+        backgroundColor: colors.background, // Cor de fundo da tela
+    },
+    loadMoreText: {
+        color: colors.text.black, // Cor PRETA
+        fontWeight: '600',
+        textDecorationLine: 'underline'
+    },
 });

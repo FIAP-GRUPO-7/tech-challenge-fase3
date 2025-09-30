@@ -1,147 +1,163 @@
-import { useLocalSearchParams, useRouter } from "expo-router"; // Importe useLocalSearchParams
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
 import { db } from "../firebaseConfig";
 import { useAuth } from "../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
 
-import AvatarImg from "../assets/images/Avatar.png";
-import { styles as homeStyles } from "../styles/HomeStyles";
+import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
 
 export default function AddTransaction() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
-  const params = useLocalSearchParams(); // Pega os parâmetros da rota
-  const recipientFromParams = params.recipient; // Pega o destinatário
+  const params = useLocalSearchParams();
+  const recipientFromParams = params.recipient;
 
-  const [value, setValue] = useState("");
+  const [balance, setBalance] = useState(2500.00);
+  // Mantemos dois estados: um para o valor numérico puro e outro para o texto formatado
+  const [numericValue, setNumericValue] = useState(0); 
+  const [formattedValue, setFormattedValue] = useState(''); 
+
   const [loading, setLoading] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
 
   useEffect(() => {
     if (!recipientFromParams) {
-      // Se não houver destinatário, volta para a tela anterior
       Alert.alert("Erro", "Nenhum destinatário selecionado.");
       router.back();
     }
   }, [recipientFromParams, router]);
 
+  // --- NOVA FUNÇÃO PARA FORMATAR O VALOR ---
+  const handleValueChange = (text) => {
+    // Remove tudo que não for dígito
+    const cleaned = text.replace(/\D/g, '');
+    if (cleaned === '') {
+        setNumericValue(0);
+        setFormattedValue('');
+        return;
+    }
+    // Converte a string de dígitos para um número (representando centavos)
+    const newNumericValue = parseInt(cleaned, 10) / 100;
+    setNumericValue(newNumericValue);
+
+    // Formata o número para o padrão de moeda brasileiro
+    const formatted = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(newNumericValue);
+    
+    setFormattedValue(formatted);
+  };
+
+
   const handleSaveTransaction = async () => {
-    if (!value.trim()) {
-      Alert.alert("Erro", "Por favor, preencha o valor.");
+    if (numericValue <= 0) {
+      Alert.alert("Erro de Validação", "Por favor, insira um valor válido e positivo.");
       return;
     }
-    const numericValue = parseFloat(value.replace(",", "."));
-    if (isNaN(numericValue) || numericValue <= 0) {
-      Alert.alert("Erro", "Por favor, insira um valor numérico válido e positivo.");
-      return;
+    if (numericValue > balance) {
+        Alert.alert("Saldo Insuficiente", `O valor da transferência não pode ser maior que o saldo disponível.`);
+        return;
     }
     setLoading(true);
     try {
       await addDoc(collection(db, "transactions"), {
         userId: user.uid,
-        recipient: recipientFromParams, // Usa o destinatário vindo dos parâmetros
-        value: -numericValue,
-        type: "Transferência", // Pode ser ajustado se necessário
+        recipient: recipientFromParams,
+        value: -numericValue, // Salva o valor numérico puro
+        type: "Transferência",
         createdAt: serverTimestamp(),
       });
-      Alert.alert("Sucesso", "Transação realizada com sucesso!");
-      router.replace('/Home'); // Volta para a Home após o sucesso
+      const newBalance = balance - numericValue;
+      setBalance(newBalance);
+      Alert.alert("Sucesso!", `Transferência de R$ ${numericValue.toFixed(2)} realizada com sucesso.`);
+      router.replace('/Home');
     } catch (error) {
       console.error("Erro ao adicionar transação: ", error);
-      Alert.alert("Erro", "Não foi possível realizar a transação.");
+      Alert.alert("Erro no Servidor", "Não foi possível realizar a transação.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={homeStyles.container}>
-       {menuVisible && (
-        <View style={homeStyles.dropdownMenu}>
-          <TouchableOpacity style={homeStyles.dropdownClose} onPress={() => setMenuVisible(false)}>
-            <Text style={{ color: colors.text.white, fontSize: 18 }}>✕</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+          <TouchableOpacity style={styles.backButtonContainer} onPress={() => router.back()}>
+              <Text style={styles.backButton}>‹</Text> 
           </TouchableOpacity>
-          <TouchableOpacity style={homeStyles.dropdownLogout} onPress={logout}>
-            <Text style={homeStyles.dropdownLogoutText}>Sair</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View style={homeStyles.header}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image source={AvatarImg} style={homeStyles.avatar} />
-          <Text style={homeStyles.headerText}>Olá, {user?.email}</Text>
-        </View>
-        <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
-          <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
-        </TouchableOpacity>
+          <Text style={styles.title}>Adicionar Transação</Text>
+          <View style={styles.backButtonContainer} /> 
       </View>
       
-      <ScrollView>
-        <View style={styles.formHeader}>
-            <TouchableOpacity style={styles.backButtonContainer} onPress={() => router.back()}>
-                <Text style={styles.backButton}>‹</Text> 
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.balanceContainer}>
+          <Text style={styles.balanceLabel}>Saldo Disponível:</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.balanceValue}>
+                {showBalance ? `R$ ${balance.toFixed(2).replace('.', ',')}` : '●●●●●●'}
+            </Text>
+            <TouchableOpacity onPress={() => setShowBalance(prev => !prev)}>
+                <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />
             </TouchableOpacity>
-            <Text style={styles.title}>Adicionar Transação</Text>
-            <View style={styles.backButtonContainer} /> 
+          </View>
         </View>
-
+        
         <View style={styles.formContainer}>
-          <Text style={styles.balanceInfo}>
-            Saldo Disponível: <Text style={styles.balanceValue}>R$ 2.500,00</Text>
-          </Text>
-          
           <Text style={styles.recipientLabel}>Transferindo para:</Text>
           <Text style={styles.recipientName}>{recipientFromParams}</Text>
-
-          <Input
-            label="Valor"
-            placeholder="R$ 1000,00"
-            value={value}
-            onChangeText={setValue}
+          
+          <Text style={styles.label}>Valor</Text>
+          <TextInput
+            placeholder="R$ 0,00"
+            value={formattedValue} // Exibe o valor formatado
+            onChangeText={handleValueChange} // Usa a nova função de formatação
             keyboardType="numeric"
             style={styles.valueInput}
+            placeholderTextColor={colors.text.muted}
           />
-          
-          <View style={styles.attachmentContainer}>
-             <Text style={styles.attachmentText}>Anexo</Text>
-             <TouchableOpacity style={styles.attachmentButton}>
-                  <Text>Escolher arquivo</Text>
-             </TouchableOpacity>
-             <Text style={styles.attachmentInfo}>Nenhum arquivo escolhido</Text>
-          </View>
-          {loading ? (
-            <ActivityIndicator size="large" color={colors.secondary} style={{ marginTop: 20 }} />
-          ) : (
-            <Button
-              title="Transferir agora"
-              onPress={handleSaveTransaction}
-              className="mt-4"
-            />
-          )}
         </View>
       </ScrollView>
+
+      <View style={styles.footer}>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.secondary} />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSaveTransaction}>
+            <Text style={styles.buttonText}>Transferir agora</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    formHeader: {
+    container: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    scrollContent: {
+        padding: spacing.lg,
+        flexGrow: 1,
+    },
+    header: {
         flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee'
     },
     title: {
         fontSize: fontSize.lg, fontWeight: "600", color: colors.text.primary, textAlign: 'center',
@@ -150,14 +166,26 @@ const styles = StyleSheet.create({
     backButton: {
         fontSize: 36, color: colors.text.black, fontWeight: '300',
     },
-    formContainer: {
-        padding: spacing.lg,
+    balanceContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.xl * 2,
     },
-    balanceInfo: {
-        fontSize: fontSize.md, color: colors.text.secondary, marginBottom: spacing.xl,
+    balanceLabel: {
+        fontSize: fontSize.md, color: colors.text.secondary,
     },
     balanceValue: {
-        fontWeight: "bold", color: colors.text.primary,
+        fontWeight: "bold", color: colors.text.primary, fontSize: fontSize.md,
+    },
+    eyeIcon: {
+        width: 24,
+        height: 24,
+        marginLeft: spacing.sm,
+        resizeMode: 'contain'
+    },
+    formContainer: {
+        flex: 1,
     },
     recipientLabel: {
         fontSize: fontSize.sm, color: colors.text.muted,
@@ -165,15 +193,33 @@ const styles = StyleSheet.create({
     recipientName: {
         fontSize: fontSize.md, fontWeight: 'bold', marginBottom: spacing.lg, borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.md,
     },
+    label: {
+        color: colors.text.secondary,
+        fontSize: fontSize.sm,
+        marginBottom: spacing.xs
+    },
     valueInput: {
-        fontSize: 28, fontWeight: 'bold', borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.sm,
+        fontSize: 28, 
+        fontWeight: 'bold', 
+        borderBottomWidth: 1, 
+        borderColor: '#ccc', 
+        paddingBottom: spacing.sm,
+        color: colors.text.primary,
     },
-    attachmentContainer: { marginTop: spacing.xl, },
-    attachmentText: { marginBottom: spacing.sm, color: colors.text.secondary, },
-    attachmentButton: {
-        backgroundColor: '#f0f0f0', padding: spacing.md, borderRadius: radius.md, borderWidth: 1, borderColor: '#ddd', alignItems: 'center',
+    footer: {
+        padding: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
     },
-    attachmentInfo: {
-        marginTop: spacing.sm, fontStyle: 'italic', color: colors.text.muted
+    button: {
+        backgroundColor: colors.secondary,
+        padding: spacing.lg,
+        borderRadius: radius.lg,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: colors.text.white,
+        fontSize: fontSize.md,
+        fontWeight: 'bold',
     }
 });
