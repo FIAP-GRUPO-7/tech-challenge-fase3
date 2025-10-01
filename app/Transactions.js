@@ -22,7 +22,7 @@ import { colors, fontSize, radius, spacing } from "../styles/theme";
 import AvatarImg from "../assets/images/Avatar.png";
 import { styles as homeStyles } from "../styles/HomeStyles";
 
-const CATEGORIAS = ["Compras", "Salário", "Transporte"];
+const CATEGORIAS = ["Pix", "Transferência", "Depósito"]
 const TIPOS = ["Todos", "Entradas", "Saídas"];
 
 const CustomDropdown = ({ isVisible, options, onSelect, onClose, buttonLayout }) => {
@@ -254,7 +254,6 @@ export default function Transactions() {
         buttonLayout={typeButtonLayout}
       />
       
-      {/* BOTÃO "CARREGAR MAIS" POSICIONADO NO LUGAR DA TABBAR */}
       <View style={styles.footer}>
         <TouchableOpacity>
             <Text style={styles.loadMoreText}>Carregar mais</Text>
@@ -289,7 +288,6 @@ const styles = StyleSheet.create({
         color: colors.text.white,
         fontSize: fontSize.md,
     },
-    // --- ESTILOS NOVOS E AJUSTADOS ---
     footer: {
         position: 'absolute',
         bottom: 0,
@@ -297,10 +295,10 @@ const styles = StyleSheet.create({
         right: 0,
         paddingVertical: spacing.xl,
         alignItems: 'center',
-        backgroundColor: colors.background, // Cor de fundo da tela
+        backgroundColor: colors.background,
     },
     loadMoreText: {
-        color: colors.text.black, // Cor PRETA
+        color: colors.text.black,
         fontWeight: '600',
         textDecorationLine: 'underline'
     },

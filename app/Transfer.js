@@ -1,29 +1,23 @@
 import { useRouter } from "expo-router";
-import { useState } from "react"; // Importação do React
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
     FlatList,
     Image,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import { db } from "../firebaseConfig";
 import { useAuth } from "../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
 
-// Importações de assets e estilos da Home
 import AvatarImg from "../assets/images/Avatar.png";
 import { styles as homeStyles } from "../styles/HomeStyles";
-
-// Dados mocados para a lista de contatos
-const RECENT_CONTACTS = [
-  { initial: 'HA', name: 'Henrique Aguiar Dos Santos' },
-  { initial: 'DM', name: 'Diego Costa Moreira' },
-  { initial: 'KL', name: 'Kauane Gonçalves Leal' },
-  { initial: 'MT', name: 'Manoel Meseque Teixeira da Silva' },
-  { initial: 'AL', name: 'Alexa Gonçalves Lins' },
-];
 
 export default function Transfer() {
   const { user, logout } = useAuth();
@@ -31,11 +25,40 @@ export default function Transfer() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [selectedContact, setSelectedContact] = useState(null);
+  
+  const [contacts, setContacts] = useState([]);
+  const [loadingContacts, setLoadingContacts] = useState(true);
+
+  useEffect(() => {
+    if (!user?.uid) {
+        setLoadingContacts(false);
+        return;
+    }
+
+    const q = query(
+      collection(db, "contacts"), 
+      where("userId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedContacts = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setContacts(fetchedContacts);
+      setLoadingContacts(false);
+    }, (error) => {
+      console.error("Erro ao buscar contatos: ", error);
+      setLoadingContacts(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   const handleNextStep = () => {
     const finalRecipient = selectedContact || recipient;
     if (!finalRecipient) {
-        alert('Por favor, insira ou selecione um destinatário.');
+        Alert.alert('Erro', 'Por favor, insira ou selecione um destinatário.');
         return;
     }
     router.push({ pathname: '/AddTransactions', params: { recipient: finalRecipient } });
@@ -47,7 +70,7 @@ export default function Transfer() {
         onPress={() => setSelectedContact(item.name)}
     >
         <View style={styles.contactInitialCircle}>
-            <Text style={styles.contactInitialText}>{item.initial}</Text>
+            <Text style={styles.contactInitialText}>{item.initials}</Text>
         </View>
         <Text style={styles.contactName}>{item.name}</Text>
     </TouchableOpacity>
@@ -92,12 +115,17 @@ export default function Transfer() {
             }}
           />
           <Text style={styles.subtitle}>Transferências recentes</Text>
-          <FlatList
-            data={RECENT_CONTACTS}
-            renderItem={renderContact}
-            keyExtractor={item => item.name}
-            contentContainerStyle={{ paddingBottom: 80 }}
-          />
+          
+          {loadingContacts ? (
+            <ActivityIndicator size="large" color={colors.secondary} />
+          ) : (
+            <FlatList
+              data={contacts}
+              renderItem={renderContact}
+              keyExtractor={item => item.id}
+              contentContainerStyle={{ paddingBottom: 80 }} 
+            />
+          )}
         <TouchableOpacity style={styles.button} onPress={handleNextStep}>
             <Text style={styles.buttonText}>Transferir agora</Text>
         </TouchableOpacity>
@@ -165,6 +193,10 @@ const styles = StyleSheet.create({
     },
     contactName: {
         fontSize: fontSize.md,
+    },
+    footer: {
+        padding: spacing.lg,
+        marginHorizontal: spacing.lg,
     },
     button: {
         backgroundColor: colors.secondary,
