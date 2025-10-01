@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import AvatarImg from "../assets/images/Avatar.png";
-import OcultarSaldoIcon from "../assets/images/ocultar-saldo-branco.png";
+
+import AvatarImg from "../../assets/images/Avatar.png";
+import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
 import { Image } from "react-native";
 
 import {
@@ -13,13 +14,13 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "../hooks/useAuth";
-import { useAuthGuard } from "../hooks/useAuthGuard";
-import { styles } from "../styles/HomeStyles";
-import { colors } from "../styles/theme";
+import { useAuth } from "../../hooks/useAuth";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
+import { styles } from "../../styles/HomeStyles";
+import { colors } from "../../styles/theme";
 
-// Firestore
-import { db } from "../firebaseConfig";
+
+import { db } from "../../firebaseConfig";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 
 export default function Home() {
@@ -32,7 +33,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
 
-  // Buscar transações da pessoa
   useEffect(() => {
     if (!user?.uid) {
       setTransactions([]);
@@ -68,16 +68,19 @@ export default function Home() {
 
   const handleShortcutPress = useCallback(
     (key) => {
-      if (key === "Transferir") router.push("/add-transaction");
-      else if (key === "Pix") router.push("/add-transaction?type=pix");
-      else if (key === "Pagar") router.push("/add-transaction?type=payment");
-      else if (key === "Comprovantes") router.push("/comprovantes");
-      else router.push("/transactions");
+
+      if (key === "Pix" || key === "Transfe" || key === "Pagar") {
+        router.push("/(tabs)/add");
+      } else if (key === "Comprovantes") {
+        router.push("/comprovantes");
+      } else {
+        router.push("/(tabs)/list");
+      }
     },
     [router]
   );
 
-  //  Função de cada linha da transação
+
   const renderTx = ({ item }) => {
     const valueColor = item.value >= 0 ? colors.accent : colors.danger;
     const displayValue =
@@ -197,7 +200,7 @@ export default function Home() {
 
           <TouchableOpacity
             style={styles.seeAllButton}
-            onPress={() => router.push("/transactions")}
+            onPress={() => router.push("/(tabs)/list")}
           >
             <Text style={styles.seeAllText}>Ver todas as transações</Text>
           </TouchableOpacity>

@@ -9,12 +9,14 @@ export default function Index() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.replace('/Home'); 
+        // Redireciona para o grupo de abas
+        router.replace('/tabs/Home');
       } else {
-        router.replace('/Login'); 
+        // Redireciona para a tela de login
+        router.replace('/Login');
       }
     }
   }, [user, loading]);
 
-  return null; 
+  return null;
 }
