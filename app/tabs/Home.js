@@ -1,27 +1,32 @@
 import React, { useState, useEffect, useCallback } from "react";
-
-import AvatarImg from "../../assets/images/Avatar.png";
-import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
-import { Image } from "react-native";
-
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-  Alert,
+  View,
 } from "react-native";
+
 import { useRouter } from "expo-router";
+
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
-
+import AvatarImg from "../../assets/images/Avatar.png";
+import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
 
 import { db } from "../../firebaseConfig";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { realizarDeposito } from "../../services/transactionService";
+
+import Button from "../../components/ui/Button";
+import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
+
 
 export default function Home() {
   useAuthGuard();
@@ -41,7 +46,7 @@ export default function Home() {
     }
 
     const q = query(
-      collection(db, "transactions"),
+      collection(db, "transacoes"),
       where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
@@ -68,7 +73,6 @@ export default function Home() {
 
   const handleShortcutPress = useCallback(
     (key) => {
-
       if (key === "Pix" || key === "Transfe" || key === "Pagar") {
         router.push("/(tabs)/add");
       } else if (key === "Comprovantes") {
@@ -80,7 +84,23 @@ export default function Home() {
     [router]
   );
 
+  const handleClick = async () => {
+    await realizarDeposito(4.0, user.uid);
+  };
 
+  const handleDownloadClick = () => {
+    if (Platform.OS === "web") {
+      alert(
+        "No ambiente web, os downloads geralmente ocorrem clicando diretamente na URL do arquivo (ex: a URL que você obtém após o upload)."
+      );
+    } else {
+      alert(
+        "No ambiente mobile, use 'expo-file-system' para baixar arquivos de URLs para o dispositivo."
+      );
+    }
+  };
+
+  // Função de cada linha da transação
   const renderTx = ({ item }) => {
     const valueColor = item.value >= 0 ? colors.accent : colors.danger;
     const displayValue =
@@ -154,6 +174,19 @@ export default function Home() {
                 {showBalance ? "R$ 2.500,00" : "******"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
+              <Button title={'TESTE TRANSAÇÃO'} onPress={() => handleClick()}>
+              </Button>
+              {/* Novo componente de upload */}
+              {user && <FileUploaderComponent user={user} />}
+              {!user && (
+                <Text style={{ color: colors.danger, marginTop: 10 }}>
+                  Faça login para gerenciar arquivos.
+                </Text>
+              )}
+              <Button
+                title={"TESTE DOWNLOAD ARQUIVO"}
+                onPress={() => handleDownloadClick()}
+              />
             </View>
             <TouchableOpacity onPress={() => setShowBalance((s) => !s)}>
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />

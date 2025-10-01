@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import { registerUser, loginUser } from "../authService";
+import { useState } from "react";
+import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { loginUser, registerUser } from "../services/authService";
 import { styles } from "../styles/LoginStyles";
 
 export default function Login() {
@@ -24,12 +24,10 @@ export default function Login() {
     return true;
   };
 
-  // No seu login.js
   const handleLogin = async () => {
     // ...
     try {
       await loginUser(email, password);
-      // Rota corrigida
       router.replace("/tabs/Home");
     } catch (err) {
       // ...
@@ -40,7 +38,6 @@ export default function Login() {
     // ...
     try {
       await registerUser(email, password);
-      // Rota corrigida
       router.replace("/tabs/Home");
     } catch (err) {
       // ...
