@@ -1,9 +1,8 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { colors } from '../../styles/theme';
 import { CustomTabIcon } from '../../components/ui/CustomTabIcon';
+import { colors } from '../../styles/theme';
 
 import HomeIcon from '../../assets/images/Icone Home.png';
 import ListIcon from '../../assets/images/Icone Listagens.png';

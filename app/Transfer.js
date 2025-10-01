@@ -12,13 +12,12 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { db } from "../../firebaseConfig";
-import { useAuth } from "../../hooks/useAuth";
-import { colors, fontSize, radius, spacing } from "../../styles/theme";
+import { db } from "../firebaseConfig";
+import { useAuth } from "../hooks/useAuth";
+import { colors, fontSize, radius, spacing } from "../styles/theme";
 
-// Importações de assets e estilos da Home
-import AvatarImg from "../../assets/images/Avatar.png";
-import { styles as homeStyles } from "../../styles/HomeStyles";
+import AvatarImg from "../assets/images/Avatar.png";
+import { styles as homeStyles } from "../styles/HomeStyles";
 
 export default function Transfer() {
   const { user, logout } = useAuth();
@@ -35,14 +34,24 @@ export default function Transfer() {
         setLoadingContacts(false);
         return;
     }
-    const q = query(collection(db, "contacts"), where("userId", "==", user.uid));
+
+    const q = query(
+      collection(db, "contacts"), 
+      where("userId", "==", user.uid)
+    );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setContacts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const fetchedContacts = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setContacts(fetchedContacts);
       setLoadingContacts(false);
     }, (error) => {
       console.error("Erro ao buscar contatos: ", error);
       setLoadingContacts(false);
     });
+
     return () => unsubscribe();
   }, [user]);
 
@@ -91,7 +100,7 @@ export default function Transfer() {
       </View>
 
       <View style={styles.card}>
-          <TouchableOpacity onPress={() => router.replace('/tabs/Home')} style={styles.closeButton}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Para quem você quer transferir?</Text>
@@ -108,21 +117,18 @@ export default function Transfer() {
           <Text style={styles.subtitle}>Transferências recentes</Text>
           
           {loadingContacts ? (
-            <ActivityIndicator style={{flex: 1}} size="large" color={colors.secondary} />
+            <ActivityIndicator size="large" color={colors.secondary} />
           ) : (
             <FlatList
               data={contacts}
               renderItem={renderContact}
               keyExtractor={item => item.id}
-              ListEmptyComponent={<Text style={styles.emptyListText}>Nenhum contato salvo ainda.</Text>}
+              contentContainerStyle={{ paddingBottom: 80 }} 
             />
           )}
-
-          <View style={styles.footer}>
-            <TouchableOpacity style={styles.button} onPress={handleNextStep}>
-                <Text style={styles.buttonText}>Continuar</Text>
-            </TouchableOpacity>
-          </View>
+        <TouchableOpacity style={styles.button} onPress={handleNextStep}>
+            <Text style={styles.buttonText}>Transferir agora</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -135,42 +141,74 @@ const styles = StyleSheet.create({
         padding: spacing.lg,
         backgroundColor: colors.background,
         borderRadius: radius.lg,
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
         elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        marginBottom: 90,
+        paddingBottom: 0,
     },
-    closeButton: { alignSelf: 'flex-start', marginBottom: spacing.md, },
-    closeButtonText: { fontSize: 24, color: colors.text.primary, },
-    title: { fontSize: fontSize.xl, fontWeight: 'bold', marginBottom: spacing.lg, },
-    subtitle: { fontSize: fontSize.md, color: colors.text.secondary, marginTop: spacing.xl, marginBottom: spacing.md, },
-    input: { borderBottomWidth: 1, borderColor: colors.text.muted, paddingVertical: spacing.md, fontSize: fontSize.md, },
-    contactRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, },
-    contactInitialCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E0E7FF', justifyContent: 'center', alignItems: 'center', marginRight: spacing.md, },
-    contactInitialText: { color: colors.secondary, fontWeight: 'bold', },
-    contactName: { fontSize: fontSize.md, },
+    closeButton: {
+        alignSelf: 'flex-start',
+        marginBottom: spacing.md,
+    },
+    closeButtonText: {
+        fontSize: 24,
+        color: colors.text.primary,
+    },
+    title: {
+        fontSize: fontSize.xl,
+        fontWeight: 'bold',
+        marginBottom: spacing.lg,
+    },
+    subtitle: {
+        fontSize: fontSize.md,
+        color: colors.text.secondary,
+        marginTop: spacing.xl,
+        marginBottom: spacing.md,
+    },
+    input: {
+        borderBottomWidth: 1,
+        borderColor: colors.text.muted,
+        paddingVertical: spacing.md,
+        fontSize: fontSize.md,
+    },
+    contactRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: spacing.md,
+    },
+    contactInitialCircle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#E0E7FF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: spacing.md,
+    },
+    contactInitialText: {
+        color: colors.secondary,
+        fontWeight: 'bold',
+    },
+    contactName: {
+        fontSize: fontSize.md,
+    },
     footer: {
-        paddingTop: spacing.lg,
-        marginTop: 'auto',
+        padding: spacing.lg,
+        marginHorizontal: spacing.lg,
     },
     button: {
         backgroundColor: colors.secondary,
         padding: spacing.lg,
         borderRadius: radius.lg,
         alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 20,
     },
     buttonText: {
         color: colors.text.white,
         fontSize: fontSize.md,
         fontWeight: 'bold',
-    },
-    emptyListText: {
-        textAlign: 'center',
-        color: colors.text.muted,
-        marginTop: 20,
     }
 });

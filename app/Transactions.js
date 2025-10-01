@@ -3,25 +3,26 @@ import { useRouter } from "expo-router";
 import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
-import { db } from "../../firebaseConfig";
-import { useAuth } from "../../hooks/useAuth";
-import { useAuthGuard } from "../../hooks/useAuthGuard";
-import { colors, fontSize, radius, spacing } from "../../styles/theme";
+import { db } from "../firebaseConfig";
+import { useAuth } from "../hooks/useAuth";
+import { useAuthGuard } from "../hooks/useAuthGuard";
+import { colors, fontSize, radius, spacing } from "../styles/theme";
 
-import AvatarImg from "../../assets/images/Avatar.png";
-import { styles as homeStyles } from "../../styles/HomeStyles";
+import AvatarImg from "../assets/images/Avatar.png";
+import { styles as homeStyles } from "../styles/HomeStyles";
 
-const CATEGORIAS = ["Compras", "Salário", "Transporte", "Transferência"];
+const CATEGORIAS = ["Pix", "Transferência", "Depósito"]
 const TIPOS = ["Todos", "Entradas", "Saídas"];
 
 const CustomDropdown = ({ isVisible, options, onSelect, onClose, buttonLayout }) => {
@@ -71,7 +72,7 @@ export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedType, setSelectedType] = useState("Todos");
+  const [selectedType, setSelectedType] = useState("Tipo");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [categoryDropdownVisible, setCategoryDropdownVisible] = useState(false);
@@ -88,14 +89,22 @@ export default function Transactions() {
         setLoading(false);
         return;
     }
-    const q = query(collection(db, "transactions"), where("userId", "==", user.uid), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, "transactions"), 
+      where("userId", "==", user.uid), 
+      orderBy("createdAt", "desc")
+    );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setAllTransactions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setAllTransactions(items);
       setLoading(false);
     }, (err) => {
-      console.error("Erro ao carregar transações:", err);
+      console.error("Erro ao buscar transações:", err);
+      Alert.alert("Erro", "Não foi possível carregar os dados.");
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, [user]);
 
@@ -108,6 +117,7 @@ export default function Transactions() {
     if (selectedDate) { transactions = transactions.filter(t => t.createdAt?.toDate().toLocaleDateString('pt-BR') === selectedDate.toLocaleDateString('pt-BR')); }
     return transactions;
   }, [allTransactions, searchQuery, selectedType, selectedCategory, selectedDate]);
+
 
   const onDateChange = (event, date) => {
     setShowDatePicker(false);
@@ -160,23 +170,32 @@ export default function Transactions() {
 
   return (
     <View style={homeStyles.container}>
-      {menuVisible}
+      {menuVisible && (
+          <View style={homeStyles.dropdownMenu}>
+              <TouchableOpacity style={homeStyles.dropdownClose} onPress={() => setMenuVisible(false)}>
+                  <Text style={{ color: colors.text.white, fontSize: 18 }}>✕</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={homeStyles.dropdownLogout} onPress={logout}>
+                  <Text style={homeStyles.dropdownLogoutText}>Sair</Text>
+              </TouchableOpacity>
+          </View>
+      )}
 
       <View style={homeStyles.header}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image source={AvatarImg} style={homeStyles.avatar} />
-          <Text style={homeStyles.headerText}>Olá, {user?.email}</Text>
-        </View>
-        <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
-          <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
-        </TouchableOpacity>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image source={AvatarImg} style={homeStyles.avatar} />
+              <Text style={homeStyles.headerText}>Olá, {user?.email}</Text>
+          </View>
+          <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
+              <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
+          </TouchableOpacity>
       </View>
       
       <View style={styles.content}>
         <View style={styles.pageHeader}>
             <TouchableOpacity onPress={() => router.back()}><Text style={styles.backButton}>‹</Text></TouchableOpacity>
             <Text style={styles.pageTitle}>Transações</Text>
-            <TouchableOpacity style={styles.newTransactionButton} onPress={() => router.push('/tabs/add')}><Text style={styles.newTransactionButtonText}>+ Nova Transação</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.newTransactionButton} onPress={() => router.push('/Transfer')}><Text style={styles.newTransactionButtonText}>+ Nova Transação</Text></TouchableOpacity>
         </View>
 
         <View style={styles.filtersContainer}>
@@ -207,18 +226,19 @@ export default function Transactions() {
 
         {showDatePicker && (<DateTimePicker value={selectedDate || new Date()} mode="date" display="default" onChange={onDateChange} />)}
 
-        {loading ? ( <ActivityIndicator style={{ flex: 1 }} size="large" color={colors.secondary} /> ) : ( 
+        {loading ? ( 
+            <ActivityIndicator style={{ flex: 1 }} size="large" color={colors.secondary} /> 
+        ) : ( 
             <FlatList 
                 data={filteredTransactions} 
                 keyExtractor={(t) => t.id}
                 renderItem={renderTx}
                 ListHeaderComponent={ListHeader}
-                ListEmptyComponent={<Text style={{textAlign: 'center', marginTop: 50}}>Nenhuma transação encontrada</Text>}
-                contentContainerStyle={{ paddingHorizontal: spacing.sm, paddingBottom: 120 }}
+                contentContainerStyle={{ paddingHorizontal: spacing.sm, flexGrow: 1 }}
             /> 
         )}
       </View>
-      
+
       <CustomDropdown 
         isVisible={categoryDropdownVisible}
         options={CATEGORIAS}
@@ -233,12 +253,18 @@ export default function Transactions() {
         onClose={() => setTypeDropdownVisible(false)}
         buttonLayout={typeButtonLayout}
       />
+      
+      <View style={styles.footer}>
+        <TouchableOpacity>
+            <Text style={styles.loadMoreText}>Carregar mais</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    content: { flex: 1, paddingHorizontal: spacing.md, backgroundColor: '#fff' },
+    content: { flex: 1, paddingHorizontal: spacing.md, backgroundColor: '#fff', marginBottom: 60 }, // Adicionado marginBottom
     pageHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.md, },
     pageTitle: { fontSize: fontSize.lg, fontWeight: "600", },
     backButton: { fontSize: 30, fontWeight: '300', },
@@ -255,6 +281,25 @@ const styles = StyleSheet.create({
     listHeaderText: { flex: 1, textAlign: 'center', fontWeight: 'bold', color: colors.text.muted, fontSize: fontSize.sm, },
     transactionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: '#F3F4F6', },
     tableCell: { flex: 1, textAlign: 'center', color: colors.text.secondary, fontSize: fontSize.sm, },
-    dropdownItem: { padding: spacing.md, },
-    dropdownItemText: { color: colors.text.white, fontSize: fontSize.md, }
+    dropdownItem: {
+        padding: spacing.md,
+    },
+    dropdownItemText: {
+        color: colors.text.white,
+        fontSize: fontSize.md,
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingVertical: spacing.xl,
+        alignItems: 'center',
+        backgroundColor: colors.background,
+    },
+    loadMoreText: {
+        color: colors.text.black,
+        fontWeight: '600',
+        textDecorationLine: 'underline'
+    },
 });
