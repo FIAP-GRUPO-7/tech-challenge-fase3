@@ -71,7 +71,7 @@ export default function Home() {
 
   const handleShortcutPress = useCallback(
     (key) => {
-      if (key === "Pix" || key === "Transferir" || key === "Pagar") {
+      if (key === "Pix" || key === "Transferir" || key === "Investir") {
         router.push("/tabs/add");
       } else if (key === "Comprovantes") {
         router.push("/comprovantes");
