@@ -10,23 +10,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { useRouter } from "expo-router";
-
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
 import AvatarImg from "../../assets/images/Avatar.png";
 import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
-
 import { db } from "../../firebaseConfig";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { realizarDeposito } from "../../services/transactionService";
-
 import Button from "../../components/ui/Button";
 import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
 
+// animações
+import Animated, { FadeInUp, FadeInDown, FadeInRight } from "react-native-reanimated";
 
 export default function Home() {
   useAuthGuard();
@@ -90,56 +88,50 @@ export default function Home() {
 
   const handleDownloadClick = () => {
     if (Platform.OS === "web") {
-      alert(
-        "No ambiente web, os downloads geralmente ocorrem clicando diretamente na URL do arquivo (ex: a URL que você obtém após o upload)."
-      );
+      alert("No ambiente web, baixe clicando na URL do arquivo.");
     } else {
-      alert(
-        "No ambiente mobile, use 'expo-file-system' para baixar arquivos de URLs para o dispositivo."
-      );
+      alert("No mobile, use 'expo-file-system' para baixar arquivos.");
     }
   };
 
-  // Função de cada linha da transação
+  // Renderizar cada transação
   const renderTx = ({ item }) => {
     const valueColor = item.value >= 0 ? colors.accent : colors.danger;
     const displayValue =
       (item.value >= 0 ? "+" : "-") + "R$ " + Math.abs(item.value).toFixed(2);
 
     return (
-      <View style={styles.transactionRow}>
-        {/* Data */}
+      <Animated.View
+        style={styles.transactionRow}
+        entering={FadeInRight.duration(400)}
+      >
         <Text style={styles.transactionMeta}>
           {item.createdAt?.toDate
             ? item.createdAt.toDate().toLocaleDateString()
             : "—"}
         </Text>
-
-        {/* Tipo */}
         <Text style={styles.transactionDesc}>{item.type || "—"}</Text>
-
-        {/* Valor */}
         <Text style={[styles.transactionValue, { color: valueColor }]}>
           {displayValue}
         </Text>
-      </View>
+      </Animated.View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={styles.container}
+      entering={FadeInUp.duration(500)}
+    >
       {/* Menu Dropdown */}
       {menuVisible && (
         <View style={styles.dropdownMenu}>
-          {/* Fechar */}
           <TouchableOpacity
             style={styles.dropdownClose}
             onPress={() => setMenuVisible(false)}
           >
             <Text style={{ color: colors.text.white, fontSize: 18 }}>✕</Text>
           </TouchableOpacity>
-
-          {/* Botão sair */}
           <TouchableOpacity style={styles.dropdownLogout} onPress={logout}>
             <Text style={styles.dropdownLogoutText}>Sair</Text>
           </TouchableOpacity>
@@ -148,25 +140,19 @@ export default function Home() {
 
       {/* Cabeçalho */}
       <View style={styles.header}>
-        {/* Avatar + Texto */}
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={AvatarImg} style={styles.avatar} />
           <Text style={styles.headerText}>Olá, {user?.email}</Text>
         </View>
-
-        {/* Botão hamburguer */}
         <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
         </TouchableOpacity>
       </View>
 
       {/* Conteúdo principal */}
-      <ScrollView
-        style={styles.mainContent}
-        contentContainerStyle={{ paddingBottom: 32 }}
-      >
+      <ScrollView style={styles.mainContent} contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Card saldo */}
-        <View style={styles.card}>
+        <Animated.View style={styles.card} entering={FadeInDown.duration(600)}>
           <View style={styles.balanceRow}>
             <View>
               <Text style={styles.cardText}>Saldo disponível</Text>
@@ -174,25 +160,12 @@ export default function Home() {
                 {showBalance ? "R$ 2.500,00" : "******"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
-              <Button title={'TESTE TRANSAÇÃO'} onPress={() => handleClick()}>
-              </Button>
-              {/* Novo componente de upload */}
-              {user && <FileUploaderComponent user={user} />}
-              {!user && (
-                <Text style={{ color: colors.danger, marginTop: 10 }}>
-                  Faça login para gerenciar arquivos.
-                </Text>
-              )}
-              <Button
-                title={"TESTE DOWNLOAD ARQUIVO"}
-                onPress={() => handleDownloadClick()}
-              />
             </View>
             <TouchableOpacity onPress={() => setShowBalance((s) => !s)}>
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Atalhos */}
         <View style={styles.shortcutsContainer}>
@@ -210,8 +183,6 @@ export default function Home() {
         {/* Transações recentes */}
         <View style={styles.summaryCard}>
           <Text style={styles.transactionTitle}>Transações recentes</Text>
-
-          {/* Cabeçalho da tabela */}
           <View style={styles.transactionsHeader}>
             <Text style={styles.transactionsHeaderText}>Data</Text>
             <Text style={styles.transactionsHeaderText}>Tipo</Text>
@@ -239,6 +210,6 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
