@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,20 +13,22 @@ import {
 
 import { useRouter } from "expo-router";
 
+import AvatarImg from "../../assets/images/Avatar.png";
+import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
-import AvatarImg from "../../assets/images/Avatar.png";
-import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
 
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { realizarDeposito } from "../../services/transactionService";
-
-import Button from "../../components/ui/Button";
-import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
-
 
 export default function Home() {
   useAuthGuard();
@@ -46,7 +48,7 @@ export default function Home() {
     }
 
     const q = query(
-      collection(db, "transacoes"),
+      collection(db, "transactions"),
       where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
@@ -73,12 +75,12 @@ export default function Home() {
 
   const handleShortcutPress = useCallback(
     (key) => {
-      if (key === "Pix" || key === "Transfe" || key === "Pagar") {
-        router.push("/(tabs)/add");
+      if (key === "Pix" || key === "Transferir" || key === "Investir") {
+        router.push("/tabs/add");
       } else if (key === "Comprovantes") {
         router.push("/comprovantes");
       } else {
-        router.push("/(tabs)/list");
+        router.push("/Transactions");
       }
     },
     [router]
@@ -174,19 +176,6 @@ export default function Home() {
                 {showBalance ? "R$ 2.500,00" : "******"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
-              <Button title={'TESTE TRANSAÇÃO'} onPress={() => handleClick()}>
-              </Button>
-              {/* Novo componente de upload */}
-              {user && <FileUploaderComponent user={user} />}
-              {!user && (
-                <Text style={{ color: colors.danger, marginTop: 10 }}>
-                  Faça login para gerenciar arquivos.
-                </Text>
-              )}
-              <Button
-                title={"TESTE DOWNLOAD ARQUIVO"}
-                onPress={() => handleDownloadClick()}
-              />
             </View>
             <TouchableOpacity onPress={() => setShowBalance((s) => !s)}>
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />
@@ -196,7 +185,7 @@ export default function Home() {
 
         {/* Atalhos */}
         <View style={styles.shortcutsContainer}>
-          {["Pix", "Transfe", "Investir"].map((item, idx) => (
+          {["Pix", "Transferir", "Investir"].map((item, idx) => (
             <TouchableOpacity
               key={idx}
               style={styles.shortcut}
@@ -210,33 +199,32 @@ export default function Home() {
         {/* Transações recentes */}
         <View style={styles.summaryCard}>
           <Text style={styles.transactionTitle}>Transações recentes</Text>
-
-          {/* Cabeçalho da tabela */}
-          <View style={styles.transactionsHeader}>
-            <Text style={styles.transactionsHeaderText}>Data</Text>
-            <Text style={styles.transactionsHeaderText}>Tipo</Text>
-            <Text style={styles.transactionsHeaderText}>Valor</Text>
-          </View>
-
           {loading ? (
             <ActivityIndicator size="small" color={colors.secondary} />
           ) : transactions.length === 0 ? (
             <Text style={styles.emptyText}>Nenhuma transação ainda.</Text>
           ) : (
-            <FlatList
-              data={transactions}
-              keyExtractor={(t) => t.id}
-              renderItem={renderTx}
-              scrollEnabled={false}
-            />
+            <>
+              {/* Cabeçalho da tabela */}
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.transactionsHeaderText}>Data</Text>
+                <Text style={styles.transactionsHeaderText}>Tipo</Text>
+                <Text style={styles.transactionsHeaderText}>Valor</Text>
+              </View>
+              <FlatList
+                data={transactions.slice(0, 3)}
+                keyExtractor={(t) => t.id}
+                renderItem={renderTx}
+                scrollEnabled={false}
+              />
+              <TouchableOpacity
+                style={styles.seeAllButton}
+                onPress={() => router.push("/tabs/list")}
+              >
+                <Text style={styles.seeAllText}>Ver todas as transações</Text>
+              </TouchableOpacity>
+            </>
           )}
-
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={() => router.push("/(tabs)/list")}
-          >
-            <Text style={styles.seeAllText}>Ver todas as transações</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
