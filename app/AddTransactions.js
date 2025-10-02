@@ -18,6 +18,7 @@ import { colors, fontSize, radius, spacing } from "../styles/theme";
 
 import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
 
+// Função para gerar as iniciais a partir de um nome
 const getInitials = (name) => {
   if (!name) return '??';
   const names = name.trim().split(' ');
@@ -35,8 +36,8 @@ export default function AddTransaction() {
 
   const [balance, setBalance] = useState(0);
   const [loadingBalance, setLoadingBalance] = useState(true);
-  const [numericValue, setNumericValue] = useState(0); 
-  const [formattedValue, setFormattedValue] = useState(''); 
+  const [numericValue, setNumericValue] = useState(0);
+  const [formattedValue, setFormattedValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
 
@@ -46,20 +47,20 @@ export default function AddTransaction() {
       router.back();
     }
   }, [recipientFromParams, router]);
-  
+
   useEffect(() => {
     if (!user?.uid) {
-        setLoadingBalance(false);
-        return;
+      setLoadingBalance(false);
+      return;
     }
     const q = query(collection(db, "transactions"), where("userId", "==", user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        let total = 0;
-        snapshot.forEach(doc => {
-            total += doc.data().value;
-        });
-        setBalance(total);
-        setLoadingBalance(false);
+      let total = 0;
+      snapshot.forEach(doc => {
+        total += doc.data().value;
+      });
+      setBalance(total);
+      setLoadingBalance(false);
     });
     return () => unsubscribe();
   }, [user]);
@@ -67,24 +68,29 @@ export default function AddTransaction() {
   const handleValueChange = (text) => {
     const cleaned = text.replace(/\D/g, '');
     if (cleaned === '') {
-        setNumericValue(0);
-        setFormattedValue('');
-        return;
+      setNumericValue(0);
+      setFormattedValue('');
+      return;
     }
     const newNumericValue = parseInt(cleaned, 10) / 100;
     setNumericValue(newNumericValue);
-    const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(newNumericValue);
+
+    const formatted = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(newNumericValue);
+    
     setFormattedValue(formatted);
   };
 
   const handleSaveTransaction = async () => {
-    if (numericValue <= 0 || !recipientFromParams) {
-      Alert.alert("Erro de Validação", "Por favor, preencha um valor válido.");
+    if (numericValue <= 0) {
+      Alert.alert("Erro de Validação", "Por favor, insira um valor válido e positivo.");
       return;
     }
     if (numericValue > balance) {
-        Alert.alert("Saldo Insuficiente", "O valor da transferência é maior que o saldo disponível.");
-        return;
+      Alert.alert("Saldo Insuficiente", "O valor da transferência é maior que o saldo disponível.");
+      return;
     }
     setLoading(true);
     try {
@@ -102,18 +108,22 @@ export default function AddTransaction() {
 
       if (querySnapshot.empty) {
         await addDoc(contactsRef, {
-            userId: user.uid,
-            name: recipientFromParams,
-            initials: getInitials(recipientFromParams)
+          userId: user.uid,
+          name: recipientFromParams,
+          initials: getInitials(recipientFromParams)
         });
       }
 
-      Alert.alert("Sucesso!", `Transferência de R$ ${numericValue.toFixed(2)} realizada com sucesso.`);
-      router.replace('/Home');
+      router.push({
+        pathname: '/Loading',
+        params: {
+          recipient: recipientFromParams,
+          value: numericValue,
+        }
+      });
     } catch (error) {
       console.error("Erro no processo de transação: ", error);
       Alert.alert("Erro no Servidor", "Não foi possível completar a operação.");
-    } finally {
       setLoading(false);
     }
   };
@@ -168,7 +178,6 @@ export default function AddTransaction() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background, },
