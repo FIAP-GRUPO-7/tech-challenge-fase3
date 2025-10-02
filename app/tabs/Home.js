@@ -20,11 +20,15 @@ import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
 
-import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { realizarDeposito } from "../../services/transactionService";
-
-
 
 export default function Home() {
   useAuthGuard();
@@ -195,33 +199,32 @@ export default function Home() {
         {/* Transações recentes */}
         <View style={styles.summaryCard}>
           <Text style={styles.transactionTitle}>Transações recentes</Text>
-
-          {/* Cabeçalho da tabela */}
-          <View style={styles.transactionsHeader}>
-            <Text style={styles.transactionsHeaderText}>Data</Text>
-            <Text style={styles.transactionsHeaderText}>Tipo</Text>
-            <Text style={styles.transactionsHeaderText}>Valor</Text>
-          </View>
-
           {loading ? (
             <ActivityIndicator size="small" color={colors.secondary} />
           ) : transactions.length === 0 ? (
             <Text style={styles.emptyText}>Nenhuma transação ainda.</Text>
           ) : (
-            <FlatList
-              data={transactions}
-              keyExtractor={(t) => t.id}
-              renderItem={renderTx}
-              scrollEnabled={false}
-            />
+            <>
+              {/* Cabeçalho da tabela */}
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.transactionsHeaderText}>Data</Text>
+                <Text style={styles.transactionsHeaderText}>Tipo</Text>
+                <Text style={styles.transactionsHeaderText}>Valor</Text>
+              </View>
+              <FlatList
+                data={transactions.slice(0, 3)}
+                keyExtractor={(t) => t.id}
+                renderItem={renderTx}
+                scrollEnabled={false}
+              />
+              <TouchableOpacity
+                style={styles.seeAllButton}
+                onPress={() => router.push("/tabs/list")}
+              >
+                <Text style={styles.seeAllText}>Ver todas as transações</Text>
+              </TouchableOpacity>
+            </>
           )}
-
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={() => router.push("/tabs/list")}
-          >
-            <Text style={styles.seeAllText}>Ver todas as transações</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

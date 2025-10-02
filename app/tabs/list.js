@@ -9,7 +9,6 @@ import {
   Modal,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
@@ -21,7 +20,7 @@ import { colors, fontSize, radius, spacing } from "../../styles/theme";
 import AvatarImg from "../../assets/images/Avatar.png";
 import { styles as homeStyles } from "../../styles/HomeStyles";
 
-const CATEGORIAS = ["Compras", "Salário", "Transporte", "Transferência"];
+const CATEGORIAS = ["Todos", "Compras", "Salário", "Transporte", "Transferência", "Depósito"];
 const TIPOS = ["Todos", "Entradas", "Saídas"];
 
 const CustomDropdown = ({ isVisible, options, onSelect, onClose, buttonLayout }) => {
@@ -70,7 +69,7 @@ export default function Transactions() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedType, setSelectedType] = useState("Todos");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -104,7 +103,7 @@ export default function Transactions() {
     if (searchQuery) { transactions = transactions.filter(t => (t.type?.toLowerCase().includes(searchQuery.toLowerCase())) || (t.recipient?.toLowerCase().includes(searchQuery.toLowerCase()))); }
     if (selectedType === "Entradas") { transactions = transactions.filter(t => t.value >= 0); }
     else if (selectedType === "Saídas") { transactions = transactions.filter(t => t.value < 0); }
-    if (selectedCategory) { transactions = transactions.filter(t => t.type === selectedCategory); }
+    if (selectedCategory && selectedCategory !== "Todos") {transactions = transactions.filter(t => t.type === selectedCategory);}
     if (selectedDate) { transactions = transactions.filter(t => t.createdAt?.toDate().toLocaleDateString('pt-BR') === selectedDate.toLocaleDateString('pt-BR')); }
     return transactions;
   }, [allTransactions, searchQuery, selectedType, selectedCategory, selectedDate]);
@@ -180,10 +179,6 @@ export default function Transactions() {
         </View>
 
         <View style={styles.filtersContainer}>
-            <View style={styles.searchContainer}>
-                <Text style={styles.searchIcon}>🔍</Text>
-                <TextInput style={styles.searchInput} placeholder="Buscar" value={searchQuery} onChangeText={setSearchQuery} placeholderTextColor="#9CA3AF"/>
-            </View>
             <View style={styles.filterButtonsContainer}>
                 <TouchableOpacity style={styles.filterButton} onPress={() => setShowDatePicker(true)}>
                     <Text style={styles.filterButtonText}>📅 {selectedDate ? selectedDate.toLocaleDateString('pt-BR') : 'Data'}</Text>
