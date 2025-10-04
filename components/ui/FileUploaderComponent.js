@@ -1,3 +1,4 @@
+import * as DocumentPicker from "expo-document-picker";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -72,32 +73,54 @@ const FileUploaderComponent = ({ user }) => {
     }
   };
 
-  const renderFileInput = () => {
-    if (Platform.OS === "web") {
-      return (
-        <input
-          type="file"
-          multiple
-          onChange={handleFileChange}
-          style={styles.fileInput}
-          disabled={isUploading}
-          accept="image/*,application/pdf"
-        />
-      );
+  const handleMobileFilePick = async () => {
+  try {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"], // limita os tipos
+      multiple: true,
+    });
+
+    if (result.canceled) {
+      return;
     }
 
+    // No expo-document-picker, cada arquivo vem em result.assets
+    const files = result.assets || [];
+    setSelectedFiles(files);
+    setUploadStatus(
+      files.map((file) => ({
+        name: file.name,
+        status: "Pronto para enviar",
+        url: null,
+      }))
+    );
+  } catch (err) {
+    console.error("Erro ao selecionar arquivo:", err);
+  }
+};
+
+const renderFileInput = () => {
+  if (Platform.OS === "web") {
     return (
-      <Button
-        title="Selecionar Documento (Mobile - Não implementado)"
-        onPress={() =>
-          alert(
-            "No ambiente móvel, use uma biblioteca como expo-document-picker para selecionar arquivos."
-          )
-        }
+      <input
+        type="file"
+        multiple
+        onChange={handleFileChange}
+        style={styles.fileInput}
         disabled={isUploading}
+        accept="image/*,application/pdf"
       />
     );
-  };
+  }
+
+  return (
+    <Button
+      title="Selecionar Documento"
+      onPress={handleMobileFilePick}
+      disabled={isUploading}
+    />
+  );
+};
 
   return (
     <View style={styles.container}>

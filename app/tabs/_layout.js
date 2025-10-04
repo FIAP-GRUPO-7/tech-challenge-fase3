@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { CustomTabIcon } from '../../components/ui/CustomTabIcon';
 import { colors } from '../../styles/theme';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeIcon from '../../assets/images/Icone Home.png';
 import ListIcon from '../../assets/images/Icone Listagens.png';
 import AddIcon from '../../assets/images/Icone transferir.png';
@@ -13,60 +14,63 @@ const PADDING_BOTTOM = 20;
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
+    <SafeAreaView style={{ flex: 1}}>
+      <Tabs
+        screenOptions={{
+          tabBarShowLabel: false,
 
-        tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: 'transparent',
-          borderTopWidth: 0,
-          elevation: 0,
-          height: BAR_HEIGHT + PADDING_BOTTOM,
-        },
+          tabBarStyle: {
+            position: 'absolute',
+            backgroundColor: 'transparent',
+            borderTopWidth: 0,
+            elevation: 0,
+            height: BAR_HEIGHT + PADDING_BOTTOM,
+          },
 
-        tabBarItemStyle: {
-          paddingTop: 10,
-          paddingBottom: PADDING_BOTTOM,
-          marginHorizontal: 5,
-        },
+          tabBarItemStyle: {
+            paddingTop: 10,
+            paddingBottom: PADDING_BOTTOM,
+            marginHorizontal: 5,
+          },
 
-        tabBarBackground: () => (
-          <View style={styles.floatingContainer} />
-        ),
-      }}
-    >
-      <Tabs.Screen
-        name="Home"
-        options={{
-          title: 'Início',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon source={HomeIcon} focused={focused} />
+          tabBarBackground: () => (
+            <View style={styles.floatingContainer} />
           ),
         }}
-      />
-      <Tabs.Screen
-        name="list"
-        options={{
-          title: 'Transações',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon source={ListIcon} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="add"
-        options={{
-          title: 'Adicionar',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon source={AddIcon} focused={focused} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="Home"
+          options={{
+            title: 'Início',
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <CustomTabIcon source={HomeIcon} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="list"
+          options={{
+            title: 'Transações',
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <CustomTabIcon source={ListIcon} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="add"
+          options={{
+            title: 'Adicionar',
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <CustomTabIcon source={AddIcon} focused={focused} />
+            ),
+          }}
+        />
+      </Tabs>
+    </SafeAreaView>
+
   );
 }
 

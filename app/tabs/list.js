@@ -75,8 +75,8 @@ export default function Transactions() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("Categoria");
-  const [selectedType, setSelectedType] = useState("Tipo");
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
+  const [selectedType, setSelectedType] = useState("Todos");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [categoryDropdownVisible, setCategoryDropdownVisible] = useState(false);
