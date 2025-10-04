@@ -2,7 +2,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   Alert,
   Image,
-  Linking,
   Platform,
   ScrollView,
   Share,
@@ -17,7 +16,7 @@ import { colors, fontSize, radius, spacing } from '../styles/theme';
 export default function Comprovante() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { recipient, value, transactionId, attachmentUrl } = params;
+  const { recipient, value, transactionId } = params;
   
   const numericValue = parseFloat(value);
   const currentDate = new Date();
@@ -104,18 +103,6 @@ export default function Comprovante() {
             <Text style={styles.infoLabel}>ID da Transação</Text>
             <Text style={styles.detailsText}>{transactionId}</Text>
           </View>
-
-          {attachmentUrl && (
-            <>
-              <View style={styles.divider} />
-              <TouchableOpacity
-                style={styles.attachmentButton}
-                onPress={() => Linking.openURL(attachmentUrl)}
-              >
-                <Text style={styles.attachmentText}>Ver comprovante anexo</Text>
-              </TouchableOpacity>
-            </>
-          )}
         </View>
       </ScrollView>
 
