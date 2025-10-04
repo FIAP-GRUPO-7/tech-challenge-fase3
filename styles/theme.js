@@ -36,6 +36,7 @@ export const fontSize = {
   md: 16,
   lg: 18,
   xl: 24,
+  "2xl": 36,
 };
 
 export const radius = {

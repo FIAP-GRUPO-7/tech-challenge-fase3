@@ -14,6 +14,10 @@ export default function RootLayout() {
         {/* Rota para a tela de login */}
         <Stack.Screen name="Login" options={{ headerShown: false }} />
         <Stack.Screen name="AddTransactions" options={{ title: "Adicionar Transação" }}/>
+        
+        {/* Rotas para o fluxo de transferência */}
+        <Stack.Screen name="Loading" options={{ headerShown: false }} />
+        <Stack.Screen name="Comprovante" options={{ headerShown: false }} />
       </Stack>
   );
 }

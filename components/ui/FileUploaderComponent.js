@@ -11,7 +11,7 @@ import {
 import { uploadFileFromBlob } from "../../services/storageService";
 import { colors } from "../../styles/theme";
 
-const FileUploaderComponent = ({ user }) => {
+const FileUploaderComponent = ({ user, onUploadSuccess }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadStatus, setUploadStatus] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -53,8 +53,14 @@ const FileUploaderComponent = ({ user }) => {
             file.name,
             user.uid
           );
+
           newUploadStatuses[i].status = `Sucesso!`;
           newUploadStatuses[i].url = downloadUrl;
+
+          if (onUploadSuccess) {
+            onUploadSuccess(downloadUrl);
+          }
+
           console.log(`Upload de ${file.name} concluído. URL: ${downloadUrl}`);
         } catch (error) {
           newUploadStatuses[i].status = `Falha: ${error.message}`;
@@ -62,7 +68,6 @@ const FileUploaderComponent = ({ user }) => {
         }
         setUploadStatus([...newUploadStatuses]);
       }
-      alert("Processo de upload concluído para todos os arquivos.");
     } catch (globalError) {
       console.error("Erro geral no processo de upload:", globalError);
       alert(`Erro geral: ${globalError.message}`);
@@ -74,53 +79,53 @@ const FileUploaderComponent = ({ user }) => {
   };
 
   const handleMobileFilePick = async () => {
-  try {
-    const result = await DocumentPicker.getDocumentAsync({
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
       type: ["image/*", "application/pdf"], // limita os tipos
-      multiple: true,
-    });
+        multiple: true,
+      });
 
-    if (result.canceled) {
-      return;
-    }
+      if (result.canceled) {
+        return;
+      }
 
     // No expo-document-picker, cada arquivo vem em result.assets
-    const files = result.assets || [];
-    setSelectedFiles(files);
-    setUploadStatus(
-      files.map((file) => ({
-        name: file.name,
-        status: "Pronto para enviar",
-        url: null,
-      }))
-    );
-  } catch (err) {
-    console.error("Erro ao selecionar arquivo:", err);
-  }
-};
+      const files = result.assets || [];
+      setSelectedFiles(files);
+      setUploadStatus(
+        files.map((file) => ({
+          name: file.name,
+          status: "Pronto para enviar",
+          url: null,
+        }))
+      );
+    } catch (err) {
+      console.error("Erro ao selecionar arquivo:", err);
+    }
+  };
 
-const renderFileInput = () => {
-  if (Platform.OS === "web") {
+  const renderFileInput = () => {
+    if (Platform.OS === "web") {
+      return (
+        <input
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          style={styles.fileInput}
+          disabled={isUploading}
+          accept="image/*,application/pdf"
+        />
+      );
+    }
+
     return (
-      <input
-        type="file"
-        multiple
-        onChange={handleFileChange}
-        style={styles.fileInput}
+      <Button
+        title="Selecionar Documento"
+        onPress={handleMobileFilePick}
         disabled={isUploading}
-        accept="image/*,application/pdf"
       />
     );
-  }
-
-  return (
-    <Button
-      title="Selecionar Documento"
-      onPress={handleMobileFilePick}
-      disabled={isUploading}
-    />
-  );
-};
+  };
 
   return (
     <View style={styles.container}>
