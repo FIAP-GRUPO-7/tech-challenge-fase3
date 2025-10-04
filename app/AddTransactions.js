@@ -154,14 +154,6 @@ export default function AddTransaction() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButtonContainer} onPress={() => router.back()}>
-          <Text style={styles.backButton}>‹</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Adicionar Transação</Text>
-        <View style={styles.backButtonContainer} />
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceLabel}>Saldo Disponível:</Text>
