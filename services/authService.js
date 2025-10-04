@@ -1,10 +1,12 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
-import { auth, db, docFirebase, setDocFirebase } from "../firebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebaseConfig";
 
-export const registerUser = async (email, password) => {
+export const registerUser = async (email, password, fullName) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -15,16 +17,22 @@ export const registerUser = async (email, password) => {
 
     if (user) {
       const uid = user.uid;
-      console.log("[registerUser - sucesso criação de usuário]");
+      
+      await updateProfile(user, {
+        displayName: fullName,
+      });
 
-      const contaRef = docFirebase(db, "contas", uid);
-      await setDocFirebase(contaRef, {
+      console.log("[registerUser - sucesso, perfil atualizado com nome]");
+
+      const contaRef = doc(db, "contas", uid);
+      await setDoc(contaRef, {                 
+        nome: fullName,
         saldo: 0,
         ultimaAtualizacao: new Date(),
         userId: uid,
       });
 
-      console.log("[registerUser - sucesso criação de dados usuário]");
+      console.log("[registerUser - sucesso, criação de dados do usuário]");
       return user;
     }
   } catch (err) {
@@ -34,8 +42,12 @@ export const registerUser = async (email, password) => {
 };
 
 export const loginUser = async (email, password) => {
-  return await signInWithEmailAndPassword(auth, email, password)
-  .then((response) => {
-    console.log(response);
-  });
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log("[loginUser - sucesso]");
+    return userCredential;
+  } catch (err) {
+    console.error(`[loginUser - falha] ${err.message}`);
+    throw new Error("Email ou senha inválidos.");
+  }
 };
