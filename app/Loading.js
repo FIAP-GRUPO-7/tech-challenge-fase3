@@ -18,23 +18,52 @@ const getInitials = (name) => {
 export default function LoadingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
-  const { recipient, value } = params;
-  const numericValue = parseFloat(value);
+  const { recipient, value, attachmentUrl } = params;
+  
+  let numericValue;
+  if (typeof value === 'number') {
+    numericValue = value;
+  } else if (typeof value === 'string') {
+    numericValue = parseFloat(value);
+  } else {
+    numericValue = 0;
+  }
 
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(progress, {
-      toValue: 1,
-      duration: 2500,
-      useNativeDriver: false,
-    }).start();
+    // Só inicia a animação se não estiver carregando a autenticação
+    if (!authLoading) {
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 2500,
+        useNativeDriver: false,
+      }).start();
+    }
 
-    const executeTransaction = async () => {
-      if (!user || !recipient || !numericValue) {
-        Alert.alert("Erro", "Dados da transação inválidos.");
+    const processTransaction = async () => {
+      if (authLoading) {
+        console.log('Aguardando carregamento da autenticação...');
+        return;
+      }
+      
+      if (!user) {
+        console.log('Usuário não autenticado, redirecionando para login...');
+        Alert.alert("Erro", "Usuário não autenticado.");
+        router.replace('/Login');
+        return;
+      }
+      
+      if (!recipient) {
+        Alert.alert("Erro", "Destinatário não informado.");
+        router.replace('/tabs/Home');
+        return;
+      }
+      
+      if (!numericValue || isNaN(numericValue) || numericValue <= 0) {
+        Alert.alert("Erro", `Valor inválido: ${value}. Deve ser um número maior que zero.`);
         router.replace('/tabs/Home');
         return;
       }
@@ -46,17 +75,19 @@ export default function LoadingScreen() {
           value: -numericValue,
           type: "Transferência",
           createdAt: serverTimestamp(),
+          attachmentUrl: attachmentUrl || null,
         });
 
+        // Cria o contato se não existir
         const contactsRef = collection(db, "contacts");
         const q = query(contactsRef, where("userId", "==", user.uid), where("name", "==", recipient));
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
           await addDoc(contactsRef, {
-              userId: user.uid,
-              name: recipient,
-              initials: getInitials(recipient)
+            userId: user.uid,
+            name: recipient,
+            initials: getInitials(recipient)
           });
         }
         
@@ -66,6 +97,7 @@ export default function LoadingScreen() {
                 recipient: recipient,
                 value: numericValue,
                 transactionId: transactionRef.id,
+                attachmentUrl: attachmentUrl,
             }
         });
 
@@ -76,16 +108,38 @@ export default function LoadingScreen() {
       }
     };
 
-    setTimeout(() => {
-        executeTransaction();
-    }, 3500);
+    if (!authLoading) {
+      setTimeout(() => {
+          processTransaction();
+      }, 3500);
+    }
 
-  }, []);
+  }, [authLoading, user]);
 
   const progressBarWidth = progress.interpolate({
     inputRange: [0, 1],
     outputRange: ['0%', '100%'],
   });
+
+  if (authLoading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Carregando...</Text>
+        <View style={styles.progressBarBackground}>
+          <View style={[styles.progressBarFill, { width: '50%' }]} />
+        </View>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Usuário não autenticado</Text>
+        <Text style={styles.errorText}>Redirecionando para login...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -111,6 +165,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xl + 10,
     fontWeight: 'bold',
     marginBottom: 40,
+  },
+  errorText: {
+    color: 'white',
+    fontSize: fontSize.md,
+    textAlign: 'center',
+    marginTop: 10,
   },
   progressBarBackground: {
     height: 4,

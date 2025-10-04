@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { addDoc, collection, getDocs, onSnapshot, query, serverTimestamp, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -20,17 +20,9 @@ import { colors, fontSize, radius, spacing } from "../styles/theme";
 import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
 import FileUploaderComponent from '../components/ui/FileUploaderComponent';
 
-const getInitials = (name) => {
-  if (!name) return '??';
-  const names = name.trim().split(' ');
-  if (names.length > 1) {
-    return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-};
 
 export default function AddTransaction() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useLocalSearchParams();
   const recipientFromParams = params.recipient;
@@ -86,7 +78,18 @@ export default function AddTransaction() {
   };
 
   const handleSaveTransaction = async () => {
-    console.log(`Iniciando validação: Valor=${numericValue}, Saldo=${balance}`);
+    console.log(`Iniciando validação: Valor=${numericValue}, Saldo=${balance}, User=${!!user}, AuthLoading=${authLoading}`);
+
+    if (authLoading) {
+      Alert.alert("Aguarde", "Carregando informações do usuário...");
+      return;
+    }
+
+    if (!user) {
+      Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
+      router.replace('/Login');
+      return;
+    }
 
     if (numericValue <= 0) {
       const message = "Por favor, insira um valor válido e positivo.";
@@ -108,48 +111,15 @@ export default function AddTransaction() {
     }
     
     setLoading(true);
-    try {
-      await addDoc(collection(db, "transactions"), {
-        userId: user.uid,
+    
+    router.push({
+      pathname: '/Loading',
+      params: {
         recipient: recipientFromParams,
-        value: -numericValue,
-        type: "Transferência",
-        createdAt: serverTimestamp(),
-        attachmentUrl: attachmentUrl || null,
-      });
-
-      const contactsRef = collection(db, "contacts");
-      const q = query(contactsRef, where("userId", "==", user.uid), where("name", "==", recipientFromParams));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        await addDoc(contactsRef, {
-          userId: user.uid,
-          name: recipientFromParams,
-          initials: getInitials(recipientFromParams)
-        });
+        value: numericValue.toString(),
+        attachmentUrl: attachmentUrl,
       }
-      
-      setLoading(false);
-      
-      router.push({
-        pathname: '/Loading',
-        params: {
-          recipient: recipientFromParams,
-          value: numericValue,
-          attachmentUrl: attachmentUrl,
-        }
-      });
-    } catch (error) {
-      console.error("Erro no processo de transação: ", error);
-      const message = "Não foi possível completar a operação.";
-      if (Platform.OS === 'web') {
-        window.alert(message);
-      } else {
-        Alert.alert("Erro no Servidor", message);
-      }
-      setLoading(false);
-    }
+    });
 };
 
   return (
