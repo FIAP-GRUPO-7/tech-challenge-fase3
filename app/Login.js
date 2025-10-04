@@ -7,8 +7,8 @@ import { styles } from "../styles/LoginStyles";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState(""); // Novo estado
-  const [isSigningUp, setIsSigningUp] = useState(false); // Novo estado
+  const [fullName, setFullName] = useState("");
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,13 +57,11 @@ export default function Login() {
   
   return (
     <View style={styles.container}>
-      {/* O título muda de acordo com o modo */}
       <Text style={styles.title}>{isSigningUp ? "Criar Conta" : "Login"}</Text>
       <Text style={styles.subtitle}>
         {isSigningUp ? "Crie uma nova conta para começar" : "Acesse sua conta bancária"}
       </Text>
 
-      {/* Campo de Nome Completo condicional */}
       {isSigningUp && (
         <TextInput
           placeholder="Nome Completo"
@@ -96,7 +94,6 @@ export default function Login() {
         <ActivityIndicator size="large" color="#2563EB" style={styles.loader} />
       ) : (
         <>
-          {/* Mostra botões de acordo com o modo */}
           {isSigningUp ? (
             <>
               <TouchableOpacity onPress={handleSignup} style={[styles.button, styles.signupButton]}>

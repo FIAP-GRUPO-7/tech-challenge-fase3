@@ -62,7 +62,7 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
                 await addDoc(collection(db, "transactions"), {
                     userId: user.uid,
                     value: 2500,
-                    type: "Depósito Inicial",
+                    type: "Depósito",
                     createdAt: serverTimestamp(),
                 });
             } catch (error) {

@@ -40,7 +40,7 @@ export default function AddTransaction() {
   const [formattedValue, setFormattedValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
-  const [attachmentUrl, setAttachmentUrl] = useState(null); // Estado para o anexo
+  const [attachmentUrl, setAttachmentUrl] = useState(null);
 
   useEffect(() => {
     if (!recipientFromParams) {
@@ -175,9 +175,11 @@ export default function AddTransaction() {
       </ScrollView>
 
       <View style={styles.footer}>
+        {loading ? <ActivityIndicator size="large" color={colors.secondary} /> : (
           <TouchableOpacity style={styles.button} onPress={handleSaveTransaction}>
             <Text style={styles.buttonText}>Transferir agora</Text>
           </TouchableOpacity>
+        )}
       </View>
     </View>
   );

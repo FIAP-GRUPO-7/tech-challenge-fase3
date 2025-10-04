@@ -6,7 +6,6 @@ import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import { colors, fontSize } from '../styles/theme';
 
-// Função para gerar as iniciais a partir de um nome
 const getInitials = (name) => {
   if (!name) return '??';
   const names = name.trim().split(' ');
@@ -24,15 +23,13 @@ export default function LoadingScreen() {
   const { recipient, value } = params;
   const numericValue = parseFloat(value);
 
-  // Animação para a barra de progresso
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Inicia a animação da barra
     Animated.timing(progress, {
       toValue: 1,
-      duration: 2500, // Duração da animação em milissegundos
-      useNativeDriver: false, // Necessário para animar a largura
+      duration: 2500,
+      useNativeDriver: false,
     }).start();
 
     const executeTransaction = async () => {
@@ -43,7 +40,6 @@ export default function LoadingScreen() {
       }
 
       try {
-        // Salva a transação no Firestore
         const transactionRef = await addDoc(collection(db, "transactions"), {
           userId: user.uid,
           recipient: recipient,
@@ -52,7 +48,6 @@ export default function LoadingScreen() {
           createdAt: serverTimestamp(),
         });
 
-        // Verifica e salva o novo contato se necessário
         const contactsRef = collection(db, "contacts");
         const q = query(contactsRef, where("userId", "==", user.uid), where("name", "==", recipient));
         const querySnapshot = await getDocs(q);
@@ -65,7 +60,6 @@ export default function LoadingScreen() {
           });
         }
         
-        // Navega para a tela de comprovante com os dados da transação
         router.replace({
             pathname: '/Comprovante',
             params: {
@@ -97,7 +91,6 @@ export default function LoadingScreen() {
     <View style={styles.container}>
       <Text style={styles.text}>Transferindo..</Text>
       
-      {/* Barra de Progresso */}
       <View style={styles.progressBarBackground}>
         <Animated.View style={[styles.progressBarFill, { width: progressBarWidth }]} />
       </View>
