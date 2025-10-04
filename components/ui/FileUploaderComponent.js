@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
   Button,
   Platform,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  View,
 } from "react-native";
 import { uploadFileFromBlob } from "../../services/storageService";
 import { colors } from "../../styles/theme";

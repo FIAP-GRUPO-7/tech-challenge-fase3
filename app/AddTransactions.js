@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { addDoc, collection, getDocs, onSnapshot, query, serverTimestamp, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,8 +17,8 @@ import { useAuth } from "../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
 
 import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
+import FileUploaderComponent from '../components/ui/FileUploaderComponent'; // Importar o componente
 
-// Função para gerar as iniciais a partir de um nome
 const getInitials = (name) => {
   if (!name) return '??';
   const names = name.trim().split(' ');
@@ -40,6 +40,7 @@ export default function AddTransaction() {
   const [formattedValue, setFormattedValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
+  const [attachmentUrl, setAttachmentUrl] = useState(null); // Estado para o anexo
 
   useEffect(() => {
     if (!recipientFromParams) {
@@ -119,6 +120,7 @@ export default function AddTransaction() {
         params: {
           recipient: recipientFromParams,
           value: numericValue,
+          attachmentUrl: attachmentUrl,
         }
       });
     } catch (error) {
@@ -165,15 +167,17 @@ export default function AddTransaction() {
             style={styles.valueInput}
             placeholderTextColor={colors.text.muted}
           />
+          
+          <View style={{marginTop: spacing.xl}}>
+            {user && <FileUploaderComponent user={user} onUploadSuccess={setAttachmentUrl} />}
+          </View>
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        {loading ? <ActivityIndicator size="large" color={colors.secondary} /> : (
           <TouchableOpacity style={styles.button} onPress={handleSaveTransaction}>
             <Text style={styles.buttonText}>Transferir agora</Text>
           </TouchableOpacity>
-        )}
       </View>
     </View>
   );
