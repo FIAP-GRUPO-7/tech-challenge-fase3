@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -85,14 +86,27 @@ export default function AddTransaction() {
   };
 
   const handleSaveTransaction = async () => {
+    console.log(`Iniciando validação: Valor=${numericValue}, Saldo=${balance}`);
+
     if (numericValue <= 0) {
-      Alert.alert("Erro de Validação", "Por favor, insira um valor válido e positivo.");
+      const message = "Por favor, insira um valor válido e positivo.";
+      if (Platform.OS === 'web') {
+        window.alert(message);
+      } else {
+        Alert.alert("Erro de Validação", message);
+      }
       return;
     }
     if (numericValue > balance) {
-      Alert.alert("Saldo Insuficiente", "O valor da transferência é maior que o saldo disponível.");
+      const message = "O valor da transferência é maior que o seu saldo disponível.";
+      if (Platform.OS === 'web') {
+        window.alert(message);
+      } else {
+        Alert.alert("Saldo Insuficiente", message);
+      }
       return;
     }
+    
     setLoading(true);
     try {
       await addDoc(collection(db, "transactions"), {
@@ -101,6 +115,7 @@ export default function AddTransaction() {
         value: -numericValue,
         type: "Transferência",
         createdAt: serverTimestamp(),
+        attachmentUrl: attachmentUrl || null,
       });
 
       const contactsRef = collection(db, "contacts");
@@ -114,7 +129,9 @@ export default function AddTransaction() {
           initials: getInitials(recipientFromParams)
         });
       }
-
+      
+      setLoading(false);
+      
       router.push({
         pathname: '/Loading',
         params: {
@@ -125,10 +142,15 @@ export default function AddTransaction() {
       });
     } catch (error) {
       console.error("Erro no processo de transação: ", error);
-      Alert.alert("Erro no Servidor", "Não foi possível completar a operação.");
+      const message = "Não foi possível completar a operação.";
+      if (Platform.OS === 'web') {
+        window.alert(message);
+      } else {
+        Alert.alert("Erro no Servidor", message);
+      }
       setLoading(false);
     }
-  };
+};
 
   return (
     <View style={styles.container}>
