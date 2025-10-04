@@ -16,9 +16,14 @@ import { db } from "../../firebaseConfig";
 import { useAuth } from "../../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../../styles/theme";
 
-// Importações de assets e estilos da Home
 import AvatarImg from "../../assets/images/Avatar.png";
 import { styles as homeStyles } from "../../styles/HomeStyles";
+
+const extractNameFromEmail = (email) => {
+  if (!email) return '';
+  const namePart = email.split('@')[0];
+  return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+};
 
 export default function Transfer() {
   const { user, logout } = useAuth();
@@ -29,6 +34,8 @@ export default function Transfer() {
   
   const [contacts, setContacts] = useState([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
+
+  const displayName = user?.displayName || extractNameFromEmail(user?.email);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -83,7 +90,7 @@ export default function Transfer() {
       <View style={homeStyles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={AvatarImg} style={homeStyles.avatar} />
-          <Text style={homeStyles.headerText}>Olá, {user?.email}</Text>
+          <Text style={homeStyles.headerText}>Olá, {user?.displayName}</Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>

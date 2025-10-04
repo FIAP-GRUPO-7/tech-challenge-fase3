@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, onSnapshot, query, serverTimestamp, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,7 +17,7 @@ import { useAuth } from "../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
 
 import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
-import FileUploaderComponent from '../components/ui/FileUploaderComponent'; // Importar o componente
+import FileUploaderComponent from '../components/ui/FileUploaderComponent';
 
 const getInitials = (name) => {
   if (!name) return '??';

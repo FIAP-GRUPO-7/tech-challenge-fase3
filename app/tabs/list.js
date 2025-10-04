@@ -58,10 +58,15 @@ const CustomDropdown = ({ isVisible, options, onSelect, onClose, buttonLayout })
     );
 };
 
+const extractNameFromEmail = (email) => {
+  if (!email) return '';
+  const namePart = email.split('@')[0];
+  return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+};
 
 export default function Transactions() {
   useAuthGuard();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   
   const [allTransactions, setAllTransactions] = useState([]);
@@ -82,6 +87,8 @@ export default function Transactions() {
   
   const categoryButtonRef = useRef(null);
   const typeButtonRef = useRef(null);
+
+  const displayName = user?.displayName || extractNameFromEmail(user?.email);
   
   useEffect(() => {
     if (!user?.uid) {
@@ -165,7 +172,7 @@ export default function Transactions() {
       <View style={homeStyles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={AvatarImg} style={homeStyles.avatar} />
-          <Text style={homeStyles.headerText}>Olá, {user?.email}</Text>
+          <Text style={homeStyles.headerText}>Olá, {user?.displayName}</Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>

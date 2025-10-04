@@ -20,8 +20,11 @@ import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
 
-// Removida a importação do FileUploaderComponent
-// import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
+const extractNameFromEmail = (email) => {
+  if (!email) return '';
+  const namePart = email.split('@')[0];
+  return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+};
 
 export default function Home() {
   useAuthGuard();
@@ -38,6 +41,8 @@ export default function Home() {
     labels: [],
     datasets: [{ data: [0] }],
   });
+
+const displayName = user?.displayName || extractNameFromEmail(user?.email);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -99,7 +104,7 @@ export default function Home() {
   }, [user, loading]);
 
   const handleShortcutPress = useCallback((key) => {
-      if (key === "Transferir" || key === "Pix") {
+      if (key === "Transferir" || key === "Pix" || key === "Investir") {
         router.push("/tabs/add");
       } else {
         router.push("/tabs/list");
@@ -153,7 +158,7 @@ export default function Home() {
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={AvatarImg} style={styles.avatar} />
-          <Text style={styles.headerText}>Olá, {user?.email}</Text>
+          <Text style={styles.headerText}>Olá, {user?.displayName}</Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible(true)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
@@ -175,8 +180,6 @@ export default function Home() {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Linha do FileUploaderComponent foi REMOVIDA daqui */}
 
         <View style={styles.summaryCard}>
             <Text style={styles.transactionTitle}>Atividade Recente</Text>
