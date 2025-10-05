@@ -1,30 +1,38 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "expo-router";
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
+  Dimensions,
   FlatList,
   Image,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
+  Platform 
 } from "react-native";
-import { useRouter } from "expo-router";
+
+import { LineChart } from "react-native-chart-kit"; 
+import AvatarImg from "../../assets/images/Avatar.png"; 
+import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png"; 
+import { db } from "../../firebaseConfig"; 
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
-import AvatarImg from "../../assets/images/Avatar.png";
-import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
-import { db } from "../../firebaseConfig";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { realizarDeposito } from "../../services/transactionService";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/Button"; 
 import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
 
 // animações
-import Animated, { FadeInUp, FadeInDown, FadeInRight } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeInDown, FadeInRight } from "react-native-reanimated"; 
+
+const extractNameFromEmail = (email) => {
+  if (!email) return '';
+  const namePart = email.split('@')[0];
+  return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+};
 
 export default function Home() {
   useAuthGuard();
@@ -35,51 +43,81 @@ export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
+  const [balance, setBalance] = useState(0);
+  
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [{ data: [0] }],
+  });
+
+const displayName = user?.displayName || extractNameFromEmail(user?.email);
 
   useEffect(() => {
     if (!user?.uid) {
-      setTransactions([]);
       setLoading(false);
       return;
     }
 
     const q = query(
-      collection(db, "transacoes"),
+      collection(db, "transactions"),
       where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const items = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTransactions(items);
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+        if (snapshot.empty && !loading) {
+            try {
+                await addDoc(collection(db, "transactions"), {
+                    userId: user.uid,
+                    value: 2500,
+                    type: "Depósito",
+                    createdAt: serverTimestamp(),
+                });
+            } catch (error) {
+                console.error("Erro ao criar depósito inicial:", error);
+            }
+        } else {
+            let total = 0;
+            const items = snapshot.docs.map((doc) => {
+                const data = doc.data();
+                total += data.value || 0;
+                return { id: doc.id, ...data };
+            });
+            
+            setTransactions(items);
+            setBalance(total);
+
+            const recentTransactions = items
+                .filter(t => t.createdAt && typeof t.createdAt.toDate === 'function')
+                .slice(0, 7)
+                .reverse();
+            
+            if (recentTransactions.length > 0) {
+                setChartData({
+                    labels: recentTransactions.map(t => t.createdAt.toDate().toLocaleDateString('pt-BR', { day: '2-digit' })),
+                    datasets: [{ data: recentTransactions.map(t => t.value) }]
+                });
+            } else {
+                setChartData({ labels: ['Início'], datasets: [{ data: [0] }] });
+            }
+        }
         setLoading(false);
-      },
-      (err) => {
+    },
+    (err) => {
         console.error("Erro ao carregar transações:", err);
-        Alert.alert("Erro", "Não foi possível carregar as transações.");
         setLoading(false);
-      }
-    );
+    });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, loading]);
 
-  const handleShortcutPress = useCallback(
-    (key) => {
-      if (key === "Pix" || key === "Transfe" || key === "Pagar") {
-        router.push("/(tabs)/add");
-      } else if (key === "Comprovantes") {
-        router.push("/comprovantes");
+  const handleShortcutPress = useCallback((key) => {
+      if (key === "Transferir" || key === "Pix" || key === "Investir") {
+        router.push("/tabs/add");
       } else {
-        router.push("/(tabs)/list");
+        router.push("/tabs/list");
       }
-    },
-    [router]
+    }, [router]
   );
 
   const handleClick = async () => {
@@ -96,9 +134,13 @@ export default function Home() {
 
   // Renderizar cada transação
   const renderTx = ({ item }) => {
-    const valueColor = item.value >= 0 ? colors.accent : colors.danger;
-    const displayValue =
-      (item.value >= 0 ? "+" : "-") + "R$ " + Math.abs(item.value).toFixed(2);
+    const value = item.value || 0;
+    const valueColor = value >= 0 ? colors.accent : colors.danger;
+    const displayValue = (value >= 0 ? "+" : "-") + "R$ " + Math.abs(value).toFixed(2);
+    
+    const dateString = item.createdAt && typeof item.createdAt.toDate === 'function'
+      ? item.createdAt.toDate().toLocaleDateString('pt-BR')
+      : "Processando...";
 
     return (
       <Animated.View
@@ -106,16 +148,26 @@ export default function Home() {
         entering={FadeInRight.duration(400)}
       >
         <Text style={styles.transactionMeta}>
-          {item.createdAt?.toDate
-            ? item.createdAt.toDate().toLocaleDateString()
-            : "—"}
+          {dateString}
         </Text>
-        <Text style={styles.transactionDesc}>{item.type || "—"}</Text>
+        <Text style={styles.transactionDesc}>{item.type || item.recipient || "—"}</Text>
         <Text style={[styles.transactionValue, { color: valueColor }]}>
           {displayValue}
         </Text>
       </Animated.View>
     );
+  };
+
+  const screenWidth = Dimensions.get("window").width;
+  const chartConfig = {
+    backgroundColor: colors.background,
+    backgroundGradientFrom: "#FFFFFF",
+    backgroundGradientTo: "#FFFFFF",
+    decimalPlaces: 2,
+    color: (opacity = 1) => `rgba(64, 135, 249, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: { borderRadius: 16 },
+    propsForDots: { r: "6", strokeWidth: "2", stroke: colors.secondary },
   };
 
   return (
@@ -138,11 +190,10 @@ export default function Home() {
         </View>
       )}
 
-      {/* Cabeçalho */}
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image source={AvatarImg} style={styles.avatar} />
-          <Text style={styles.headerText}>Olá, {user?.email}</Text>
+          <Text style={styles.headerText}>Olá, {user?.displayName}</Text>
         </View>
         <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
@@ -157,7 +208,7 @@ export default function Home() {
             <View>
               <Text style={styles.cardText}>Saldo disponível</Text>
               <Text style={styles.cardAmount}>
-                {showBalance ? "R$ 2.500,00" : "******"}
+                {showBalance ? `R$ ${balance.toFixed(2).replace('.', ',')}` : "●●●●●●"}
               </Text>
               <Text style={styles.cardSubtitle}>Conta Corrente</Text>
             </View>
@@ -167,20 +218,30 @@ export default function Home() {
           </View>
         </Animated.View>
 
-        {/* Atalhos */}
+        <View style={styles.summaryCard}>
+            <Text style={styles.transactionTitle}>Atividade Recente</Text>
+            {loading ? (
+                <ActivityIndicator />
+            ) : (
+                <LineChart
+                    data={chartData}
+                    width={screenWidth - 64}
+                    height={220}
+                    chartConfig={chartConfig}
+                    bezier
+                    style={{ marginVertical: 8, borderRadius: 16 }}
+                />
+            )}
+        </View>
+
         <View style={styles.shortcutsContainer}>
-          {["Pix", "Transfe", "Investir"].map((item, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.shortcut}
-              onPress={() => handleShortcutPress(item)}
-            >
+          {["Pix", "Transferir", "Investir"].map((item, idx) => (
+            <TouchableOpacity key={idx} style={styles.shortcut} onPress={() => handleShortcutPress(item)}>
               <Text style={styles.shortcutText}>{item}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Transações recentes */}
         <View style={styles.summaryCard}>
           <Text style={styles.transactionTitle}>Transações recentes</Text>
           <View style={styles.transactionsHeader}>
@@ -195,17 +256,14 @@ export default function Home() {
             <Text style={styles.emptyText}>Nenhuma transação ainda.</Text>
           ) : (
             <FlatList
-              data={transactions}
+              data={transactions.slice(0, 5)}
               keyExtractor={(t) => t.id}
               renderItem={renderTx}
               scrollEnabled={false}
             />
           )}
 
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={() => router.push("/(tabs)/list")}
-          >
+          <TouchableOpacity style={styles.seeAllButton} onPress={() => router.push("/tabs/list")}>
             <Text style={styles.seeAllText}>Ver todas as transações</Text>
           </TouchableOpacity>
         </View>

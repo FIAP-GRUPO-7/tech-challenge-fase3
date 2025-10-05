@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import * as DocumentPicker from "expo-document-picker";
+import { useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
   Button,
   Platform,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  View,
 } from "react-native";
 import { uploadFileFromBlob } from "../../services/storageService";
 import { colors } from "../../styles/theme";
 
-const FileUploaderComponent = ({ user }) => {
+const FileUploaderComponent = ({ user, onUploadSuccess }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadStatus, setUploadStatus] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -52,8 +53,14 @@ const FileUploaderComponent = ({ user }) => {
             file.name,
             user.uid
           );
+
           newUploadStatuses[i].status = `Sucesso!`;
           newUploadStatuses[i].url = downloadUrl;
+
+          if (onUploadSuccess) {
+            onUploadSuccess(downloadUrl);
+          }
+
           console.log(`Upload de ${file.name} concluído. URL: ${downloadUrl}`);
         } catch (error) {
           newUploadStatuses[i].status = `Falha: ${error.message}`;
@@ -61,7 +68,6 @@ const FileUploaderComponent = ({ user }) => {
         }
         setUploadStatus([...newUploadStatuses]);
       }
-      alert("Processo de upload concluído para todos os arquivos.");
     } catch (globalError) {
       console.error("Erro geral no processo de upload:", globalError);
       alert(`Erro geral: ${globalError.message}`);
@@ -69,6 +75,32 @@ const FileUploaderComponent = ({ user }) => {
       setIsUploading(false);
       setSelectedFiles([]);
       setUploadStatus([]);
+    }
+  };
+
+  const handleMobileFilePick = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"], // limita os tipos
+        multiple: true,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+    // No expo-document-picker, cada arquivo vem em result.assets
+      const files = result.assets || [];
+      setSelectedFiles(files);
+      setUploadStatus(
+        files.map((file) => ({
+          name: file.name,
+          status: "Pronto para enviar",
+          url: null,
+        }))
+      );
+    } catch (err) {
+      console.error("Erro ao selecionar arquivo:", err);
     }
   };
 
@@ -88,12 +120,8 @@ const FileUploaderComponent = ({ user }) => {
 
     return (
       <Button
-        title="Selecionar Documento (Mobile - Não implementado)"
-        onPress={() =>
-          alert(
-            "No ambiente móvel, use uma biblioteca como expo-document-picker para selecionar arquivos."
-          )
-        }
+        title="Selecionar Documento"
+        onPress={handleMobileFilePick}
         disabled={isUploading}
       />
     );

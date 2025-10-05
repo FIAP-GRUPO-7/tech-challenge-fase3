@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors, spacing, radius, fontSize } from "./theme";
+import { colors, fontSize, radius, spacing } from "./theme";
 
 export const styles = StyleSheet.create({
   container: {
@@ -117,21 +117,22 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: spacing.lg,
     marginBottom: spacing.lg,
+
   },
 
   shortcut: {
-    width: 54,
-    height: 54,
+    width: 64,
+    height: 64,
     borderRadius: 32,
     backgroundColor: colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginHorizontal: spacing.sm,
   },
 
   shortcutText: {
     color: colors.text.white,
-    fontSize: fontSize.sm,
+    fontSize: fontSize.sm - 2,
     fontWeight: '600',
     textAlign: 'center',
   },
