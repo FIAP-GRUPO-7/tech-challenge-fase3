@@ -95,10 +95,14 @@ npx expo start
 - ✅ **Login e Autenticação com Firebase** (Cadastro + Login + Logout)  
 - ✅ **Sessão persistente** → usuário permanece logado após refresh  
 - ✅ **Rotas protegidas** → só acessa `Home` se estiver autenticado  
-- 📊 Dashboard (em desenvolvimento)  
-- 📋 Listagem e filtros de transações (em desenvolvimento)  
-- ➕ Adição/Edição de transações (em desenvolvimento)  
-- 📤 Upload de comprovantes para Firebase Storage (em desenvolvimento)  
+- ✅ **Dashboard** com **Gráficos e Análises** 
+- ✅ **Animações Fluidas** para Transições entre Seções (Reanimated/Animated) 
+- ✅ **Listagem e filtros de transações** (por data, categoria, etc.)
+- ✅ **Busca e Filtragem Integrada** com Cloud Firestore 
+- ✅ **Paginação** implementada para lidar com grande volume de dados 
+- ✅ **Adição/Edição de transações**
+- ✅ **Validação Avançada** de Valor e Categoria 
+- 📤 Upload de comprovantes para **Firebase Storage** (em desenvolvimento) 
 
 ---
 
