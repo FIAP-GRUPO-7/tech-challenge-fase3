@@ -102,7 +102,7 @@ npx expo start
 - ✅ **Paginação** implementada para lidar com grande volume de dados 
 - ✅ **Adição/Edição de transações**
 - ✅ **Validação Avançada** de Valor e Categoria 
-- ✅ Upload de comprovantes para **Firebase Storage** (em desenvolvimento) 
+- ✅ Upload de comprovantes para **Firebase Storage**
 
 ---
 
