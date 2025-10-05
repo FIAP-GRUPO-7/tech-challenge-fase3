@@ -4,20 +4,82 @@ import {
   Image,
   Platform,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { useAuth } from '../hooks/useAuth';
+
+
 import ConfirmationIcon from '../assets/images/Confirmation icon.png';
+import ComprovanteIcon from '../assets/images/Icone de Comprovante.png';
 import { colors, fontSize, radius, spacing } from '../styles/theme';
+
+const generateReceiptHTML = (params, formattedDate) => {
+  const { recipient, value, transactionId } = params;
+  const numericValue = parseFloat(value).toFixed(2).replace('.', ',');
+
+  return `
+        <html>
+        <head>
+            <style>
+                body { font-family: sans-serif; padding: 20px; background-color: #f7f7f7; }
+                .card { background-color: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+                .header { text-align: center; margin-bottom: 20px; }
+                .title { font-size: 20px; font-weight: bold; color: #1f2937; margin-top: 5px; }
+                .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+                .label { font-size: 14px; color: #6b7280; }
+                .value { font-size: 16px; font-weight: 600; color: #1f2937; }
+                .value-amount { font-size: 20px; font-weight: bold; color: #00b894; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="header">
+                    <h2 class="title">Comprovante de Transferência</h2>
+                </div>
+                
+                <div class="row">
+                    <span class="label">Valor</span>
+                    <span class="value value-amount">R$ ${numericValue}</span>
+                </div>
+                
+                <div class="row">
+                    <span class="label">Recebedor</span>
+                    <span class="value">${recipient}</span>
+                </div>
+                
+                <div class="row">
+                    <span class="label">Data e hora</span>
+                    <span class="value">${formattedDate}</span>
+                </div>
+                
+                <div class="row" style="border-bottom: none;">
+                    <span class="label">ID da Transação</span>
+                    <span class="value">${transactionId}</span>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #9ca3af;">
+                Documento gerado pelo sistema FIAP-BANK
+            </div>
+        </body>
+        </html>
+    `;
+};
+
 
 export default function Comprovante() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { recipient, value, transactionId } = params;
-  
+
+  const { user } = useAuth();
+
   const numericValue = parseFloat(value);
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString('pt-BR', {
@@ -28,20 +90,46 @@ export default function Comprovante() {
     minute: '2-digit'
   });
 
-  const handleShare = async () => {
+  const handleGenerateAndSavePDF = async () => {
+    if (!transactionId || !user?.uid) {
+      Alert.alert('Erro', 'ID da transação ou ID do usuário não encontrado. Operação abortada.');
+      return;
+    }
+
     try {
-      const message = `Transferência realizada!\n\n` +
-        `Para: ${recipient}\n` +
-        `Valor: R$ ${numericValue.toFixed(2).replace('.', ',')}\n` +
-        `Data: ${formattedDate}\n` +
-        `ID: ${transactionId}`;
-      
-      await Share.share({
-        message: message,
-        title: 'Comprovante de Transferência'
+      const html = generateReceiptHTML(params, formattedDate);
+      const { uri } = await Print.printToFileAsync({ html, base64: false });
+
+      if (!uri) return Alert.alert('Erro', 'Não foi possível gerar o PDF.');
+
+      Alert.alert('Processando', 'Fazendo upload do comprovante para o Storage...', [{ text: "Aguarde" }]);
+
+      const userId = user.uid;
+      const fileName = `comprovante_${transactionId}.pdf`;
+
+      const pdfUrl = await uploadFileFromUri(uri, fileName, userId);
+
+      const transactionRef = doc(db, "transactions", transactionId);
+      await updateDoc(transactionRef, {
+        pdfReceiptUrl: pdfUrl,
+        receiptUploaded: true,
       });
+      Alert.alert(
+        'Comprovante Salvo!',
+        'O comprovante foi salvo no Firebase e agora você pode compartilhá-lo ou baixá-lo.',
+        [
+          {
+            text: "Compartilhar/Baixar PDF",
+            onPress: () => Sharing.shareAsync(uri),
+            style: "default"
+          },
+          { text: "OK", style: "cancel" }
+        ]
+      );
+
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível compartilhar o comprovante.');
+      console.error("Erro no PDF/Upload:", error);
+      Alert.alert('Erro no Processamento', `Falha ao gerar ou salvar o comprovante. Detalhes: ${error.message}`);
     }
   };
 
@@ -49,20 +137,21 @@ export default function Comprovante() {
     <View style={styles.container}>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => router.replace('/tabs/Home')}
-        accessibilityLabel="Fechar comprovante"
-      >
-        <Text style={styles.closeButtonText}>×</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => router.replace('/tabs/Home')}
+          accessibilityLabel="Fechar comprovante"
+        >
+          <Text style={styles.closeButtonText}>×</Text>
+        </TouchableOpacity>
+
         {/* Header */}
         <View style={styles.header}>
           <Image source={ConfirmationIcon} style={styles.confirmationIcon} />
           <Text style={styles.successTitle}>Transferência concluída</Text>
         </View>
 
-        {/* Card principal */}
+        {/* Card principal (Conteúdo visual inalterado) */}
         <View style={styles.receiptCard}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Valor</Text>
@@ -106,16 +195,19 @@ export default function Comprovante() {
         </View>
       </ScrollView>
 
-      {/* Botão compartilhar */}
+      {/* Botão compartilhar*/}
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Text style={styles.shareButtonText}>Compartilhar comprovante</Text>
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={handleGenerateAndSavePDF}
+        >
+          <Image source={ComprovanteIcon} style={styles.shareIcon} />
+          <Text style={styles.shareButtonText}>Visualizar/Salvar Comprovante</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -267,4 +359,18 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     fontWeight: 'bold',
   },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.secondary,
+    paddingVertical: spacing.md,
+    borderRadius: radius.md,
+  },
+  shareIcon: {
+    width: 22,
+    height: 22,
+    marginRight: spacing.sm,
+  },
+
 });
