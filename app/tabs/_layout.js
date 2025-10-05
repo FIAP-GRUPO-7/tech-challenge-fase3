@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { colors } from '../../styles/theme'; // Importação consolidada
-import { CustomTabIcon } from '../../components/ui/CustomTabIcon'; // Importação consolidada
-import { SafeAreaView } from 'react-native-safe-area-context'; // Importação consolidada
+import { colors } from '../../styles/theme';
+import { CustomTabIcon } from '../../components/ui/CustomTabIcon'; 
+import { SafeAreaView } from 'react-native-safe-area-context'; 
 import HomeIcon from '../../assets/images/Icone Home.png';
 import ListIcon from '../../assets/images/Icone Listagens.png';
 import AddIcon from '../../assets/images/Icone transferir.png';

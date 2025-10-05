@@ -9,16 +9,24 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Platform 
 } from "react-native";
-import { LineChart } from "react-native-chart-kit";
-import AvatarImg from "../../assets/images/Avatar.png";
-import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png";
-import { db } from "../../firebaseConfig";
+
+import { LineChart } from "react-native-chart-kit"; 
+import AvatarImg from "../../assets/images/Avatar.png"; 
+import OcultarSaldoIcon from "../../assets/images/ocultar-saldo-branco.png"; 
+import { db } from "../../firebaseConfig"; 
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { styles } from "../../styles/HomeStyles";
 import { colors } from "../../styles/theme";
+import { realizarDeposito } from "../../services/transactionService";
+import Button from "../../components/ui/Button"; 
+import FileUploaderComponent from "../../components/ui/FileUploaderComponent";
+
+// animações
+import Animated, { FadeInUp, FadeInDown, FadeInRight } from "react-native-reanimated"; 
 
 const extractNameFromEmail = (email) => {
   if (!email) return '';
@@ -112,6 +120,19 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
     }, [router]
   );
 
+  const handleClick = async () => {
+    await realizarDeposito(4.0, user.uid);
+  };
+
+  const handleDownloadClick = () => {
+    if (Platform.OS === "web") {
+      alert("No ambiente web, baixe clicando na URL do arquivo.");
+    } else {
+      alert("No mobile, use 'expo-file-system' para baixar arquivos.");
+    }
+  };
+
+  // Renderizar cada transação
   const renderTx = ({ item }) => {
     const value = item.value || 0;
     const valueColor = value >= 0 ? colors.accent : colors.danger;
@@ -122,11 +143,18 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
       : "Processando...";
 
     return (
-      <View style={styles.transactionRow}>
-        <Text style={styles.transactionMeta}>{dateString}</Text>
+      <Animated.View
+        style={styles.transactionRow}
+        entering={FadeInRight.duration(400)}
+      >
+        <Text style={styles.transactionMeta}>
+          {dateString}
+        </Text>
         <Text style={styles.transactionDesc}>{item.type || item.recipient || "—"}</Text>
-        <Text style={[styles.transactionValue, { color: valueColor }]}>{displayValue}</Text>
-      </View>
+        <Text style={[styles.transactionValue, { color: valueColor }]}>
+          {displayValue}
+        </Text>
+      </Animated.View>
     );
   };
 
@@ -143,16 +171,23 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={styles.container}
+      entering={FadeInUp.duration(500)}
+    >
+      {/* Menu Dropdown */}
       {menuVisible && (
-          <View style={styles.dropdownMenu}>
-              <TouchableOpacity style={styles.dropdownClose} onPress={() => setMenuVisible(false)}>
-                  <Text style={{ color: colors.text.white, fontSize: 18 }}>✕</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dropdownLogout} onPress={logout}>
-                  <Text style={styles.dropdownLogoutText}>Sair</Text>
-              </TouchableOpacity>
-          </View>
+        <View style={styles.dropdownMenu}>
+          <TouchableOpacity
+            style={styles.dropdownClose}
+            onPress={() => setMenuVisible(false)}
+          >
+            <Text style={{ color: colors.text.white, fontSize: 18 }}>✕</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dropdownLogout} onPress={logout}>
+            <Text style={styles.dropdownLogoutText}>Sair</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       <View style={styles.header}>
@@ -160,13 +195,15 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
           <Image source={AvatarImg} style={styles.avatar} />
           <Text style={styles.headerText}>Olá, {user?.displayName}</Text>
         </View>
-        <TouchableOpacity onPress={() => setMenuVisible(true)}>
+        <TouchableOpacity onPress={() => setMenuVisible((prev) => !prev)}>
           <Text style={{ color: colors.text.black, fontSize: 22 }}>☰</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.mainContent} contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={styles.card}>
+      {/* Conteúdo principal */}
+      <ScrollView style={styles.mainContent} contentContainerStyle={{ paddingBottom: 32 }}>
+        {/* Card saldo */}
+        <Animated.View style={styles.card} entering={FadeInDown.duration(600)}>
           <View style={styles.balanceRow}>
             <View>
               <Text style={styles.cardText}>Saldo disponível</Text>
@@ -179,7 +216,7 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
               <Image source={OcultarSaldoIcon} style={styles.eyeIcon} />
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
 
         <View style={styles.summaryCard}>
             <Text style={styles.transactionTitle}>Atividade Recente</Text>
@@ -231,6 +268,6 @@ const displayName = user?.displayName || extractNameFromEmail(user?.email);
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }

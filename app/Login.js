@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { loginUser, registerUser } from "../services/authService";
 import { styles } from "../styles/LoginStyles";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 export default function Login() {
   const [email, setEmail] = useState("");
