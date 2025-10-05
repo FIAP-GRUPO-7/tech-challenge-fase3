@@ -9,10 +9,8 @@ export default function Index() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        // Redireciona para o grupo de abas
         router.replace('/tabs/Home');
       } else {
-        // Redireciona para a tela de login
         router.replace('/Login');
       }
     }
