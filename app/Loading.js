@@ -19,9 +19,9 @@ export default function LoadingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { user, loading: authLoading } = useAuth();
-  
+
   const { recipient, value, attachmentUrl } = params;
-  
+
   let numericValue;
   if (typeof value === 'number') {
     numericValue = value;
@@ -34,7 +34,6 @@ export default function LoadingScreen() {
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Só inicia a animação se não estiver carregando a autenticação
     if (!authLoading) {
       Animated.timing(progress, {
         toValue: 1,
@@ -48,20 +47,20 @@ export default function LoadingScreen() {
         console.log('Aguardando carregamento da autenticação...');
         return;
       }
-      
+
       if (!user) {
         console.log('Usuário não autenticado, redirecionando para login...');
         Alert.alert("Erro", "Usuário não autenticado.");
         router.replace('/Login');
         return;
       }
-      
+
       if (!recipient) {
         Alert.alert("Erro", "Destinatário não informado.");
         router.replace('/tabs/Home');
         return;
       }
-      
+
       if (!numericValue || isNaN(numericValue) || numericValue <= 0) {
         Alert.alert("Erro", `Valor inválido: ${value}. Deve ser um número maior que zero.`);
         router.replace('/tabs/Home');
@@ -90,15 +89,15 @@ export default function LoadingScreen() {
             initials: getInitials(recipient)
           });
         }
-        
+
         router.replace({
-            pathname: '/Comprovante',
-            params: {
-                recipient: recipient,
-                value: numericValue,
-                transactionId: transactionRef.id,
-                attachmentUrl: attachmentUrl,
-            }
+          pathname: '/Comprovante',
+          params: {
+            recipient: recipient,
+            value: numericValue,
+            transactionId: transactionRef.id,
+            attachmentUrl: attachmentUrl,
+          }
         });
 
       } catch (error) {
@@ -110,7 +109,7 @@ export default function LoadingScreen() {
 
     if (!authLoading) {
       setTimeout(() => {
-          processTransaction();
+        processTransaction();
       }, 3500);
     }
 
@@ -144,7 +143,7 @@ export default function LoadingScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Transferindo..</Text>
-      
+
       <View style={styles.progressBarBackground}>
         <Animated.View style={[styles.progressBarFill, { width: progressBarWidth }]} />
       </View>

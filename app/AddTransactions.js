@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -16,6 +16,7 @@ import {
 import { db } from "../firebaseConfig";
 import { useAuth } from "../hooks/useAuth";
 import { colors, fontSize, radius, spacing } from "../styles/theme";
+import { uploadFileFromUri } from '../services/storageService';
 
 import OcultarSaldoIcon from '../assets/images/ocultar-saldo-preto.png';
 import FileUploaderComponent from '../components/ui/FileUploaderComponent';
@@ -33,7 +34,11 @@ export default function AddTransaction() {
   const [formattedValue, setFormattedValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
-  const [attachmentUrl, setAttachmentUrl] = useState(null);
+  const fileToUploadRef = useRef(null);
+  const handleFileSelection = (fileObject) => {
+    fileToUploadRef.current = fileObject;
+    console.log("Arquivo local selecionado e pronto para upload:", fileObject);
+  };
 
   useEffect(() => {
     if (!recipientFromParams) {
@@ -73,54 +78,47 @@ export default function AddTransaction() {
       style: 'currency',
       currency: 'BRL',
     }).format(newNumericValue);
-    
+
     setFormattedValue(formatted);
   };
 
   const handleSaveTransaction = async () => {
-    console.log(`Iniciando validação: Valor=${numericValue}, Saldo=${balance}, User=${!!user}, AuthLoading=${authLoading}`);
-
     if (authLoading) {
       Alert.alert("Aguarde", "Carregando informações do usuário...");
       return;
     }
+    if (!user) { /* ... */ return; }
+    if (numericValue <= 0) { /* ... */ return; }
+    if (numericValue > balance) { /* ... */ return; }
 
-    if (!user) {
-      Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
-      router.replace('/Login');
-      return;
-    }
-
-    if (numericValue <= 0) {
-      const message = "Por favor, insira um valor válido e positivo.";
-      if (Platform.OS === 'web') {
-        window.alert(message);
-      } else {
-        Alert.alert("Erro de Validação", message);
-      }
-      return;
-    }
-    if (numericValue > balance) {
-      const message = "O valor da transferência é maior que o seu saldo disponível.";
-      if (Platform.OS === 'web') {
-        window.alert(message);
-      } else {
-        Alert.alert("Saldo Insuficiente", message);
-      }
-      return;
-    }
-    
     setLoading(true);
-    
+
+    let finalAttachmentUrl = null;
+    const fileToUpload = fileToUploadRef.current;
+
+    if (fileToUpload && fileToUpload.uri) {
+      try {
+
+        const fileName = `comprovante_${user.uid}_${new Date().getTime()}.pdf`;
+        finalAttachmentUrl = await uploadFileFromUri(fileToUpload.uri, fileName, user.uid);
+        console.log("Upload CONCLUÍDO. URL obtida e pronta para navegar:", finalAttachmentUrl);
+      } catch (error) {
+        console.error("Erro no upload do comprovante ANTES da transação:", error);
+        Alert.alert("Erro de Upload", "Não foi possível enviar o comprovante. Tente novamente.");
+        setLoading(false);
+        return;
+      }
+    }
+
     router.push({
       pathname: '/Loading',
       params: {
         recipient: recipientFromParams,
         value: numericValue.toString(),
-        attachmentUrl: attachmentUrl,
+        attachmentUrl: finalAttachmentUrl,
       }
     });
-};
+  };
 
   return (
     <View style={styles.container}>
@@ -151,9 +149,9 @@ export default function AddTransaction() {
             style={styles.valueInput}
             placeholderTextColor={colors.text.muted}
           />
-          
-          <View style={{marginTop: spacing.xl}}>
-            {user && <FileUploaderComponent user={user} onUploadSuccess={setAttachmentUrl} />}
+
+          <View style={{ marginTop: spacing.xl }}>
+            {user && <FileUploaderComponent user={user} onFileSelected={handleFileSelection} />}
           </View>
         </View>
       </ScrollView>
@@ -170,22 +168,22 @@ export default function AddTransaction() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background, },
-    scrollContent: { padding: spacing.lg, flexGrow: 1, },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: '#eee' },
-    title: { fontSize: fontSize.lg, fontWeight: "600", color: colors.text.primary, textAlign: 'center', },
-    backButtonContainer: { width: 40 },
-    backButton: { fontSize: 36, color: colors.text.black, fontWeight: '300', },
-    balanceContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl * 2, },
-    balanceLabel: { fontSize: fontSize.md, color: colors.text.secondary, },
-    balanceValue: { fontWeight: "bold", color: colors.text.primary, fontSize: fontSize.md, },
-    eyeIcon: { width: 24, height: 24, marginLeft: spacing.sm, resizeMode: 'contain' },
-    formContainer: { flex: 1, },
-    recipientLabel: { fontSize: fontSize.sm, color: colors.text.muted, },
-    recipientName: { fontSize: fontSize.md, fontWeight: 'bold', marginBottom: spacing.lg, borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.md, },
-    label: { color: colors.text.secondary, fontSize: fontSize.sm, marginBottom: spacing.xs },
-    valueInput: { fontSize: 28, fontWeight: 'bold', borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.sm, color: colors.text.primary, },
-    footer: { padding: spacing.lg, borderTopWidth: 1, borderTopColor: '#eee', },
-    button: { backgroundColor: colors.secondary, padding: spacing.lg, borderRadius: radius.lg, alignItems: 'center', },
-    buttonText: { color: colors.text.white, fontSize: fontSize.md, fontWeight: 'bold', }
+  container: { flex: 1, backgroundColor: colors.background, },
+  scrollContent: { padding: spacing.lg, flexGrow: 1, },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md, borderBottomWidth: 1, borderBottomColor: '#eee' },
+  title: { fontSize: fontSize.lg, fontWeight: "600", color: colors.text.primary, textAlign: 'center', },
+  backButtonContainer: { width: 40 },
+  backButton: { fontSize: 36, color: colors.text.black, fontWeight: '300', },
+  balanceContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl * 2, },
+  balanceLabel: { fontSize: fontSize.md, color: colors.text.secondary, },
+  balanceValue: { fontWeight: "bold", color: colors.text.primary, fontSize: fontSize.md, },
+  eyeIcon: { width: 24, height: 24, marginLeft: spacing.sm, resizeMode: 'contain' },
+  formContainer: { flex: 1, },
+  recipientLabel: { fontSize: fontSize.sm, color: colors.text.muted, },
+  recipientName: { fontSize: fontSize.md, fontWeight: 'bold', marginBottom: spacing.lg, borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.md, },
+  label: { color: colors.text.secondary, fontSize: fontSize.sm, marginBottom: spacing.xs },
+  valueInput: { fontSize: 28, fontWeight: 'bold', borderBottomWidth: 1, borderColor: '#ccc', paddingBottom: spacing.sm, color: colors.text.primary, },
+  footer: { padding: spacing.lg, borderTopWidth: 1, borderTopColor: '#eee', },
+  button: { backgroundColor: colors.secondary, padding: spacing.lg, borderRadius: radius.lg, alignItems: 'center', },
+  buttonText: { color: colors.text.white, fontSize: fontSize.md, fontWeight: 'bold', }
 });
