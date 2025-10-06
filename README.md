@@ -106,7 +106,7 @@ npx expo start
 
 ---
 
-### Demonstração do Projeto
+## Demonstração do Projeto
 [Assista à apresentação completa no Google Drive](https://drive.google.com/file/d/1DptO--nbIQGsZ1KGTWbq7WicZyD-wh7y/view?usp=sharing)
 
 ---
