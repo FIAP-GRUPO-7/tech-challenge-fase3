@@ -1,11 +1,11 @@
-# 🚀 Tech Challenge – Grupo 8 (FIAP) - Fase 3  
+# Tech Challenge – Grupo 8 (FIAP) - Fase 3  
 
 Projeto desenvolvido como parte do desafio técnico da **Fase 3** do curso **POSTECH FIAP**.  
 O foco desta fase é o **desenvolvimento mobile** utilizando **React Native (com Expo)**, integrando **Firebase** para autenticação, armazenamento e gerenciamento de transações financeiras.  
 
 ---
 
-## 📚 Sobre o Projeto  
+## Sobre o Projeto  
 
 Este projeto consiste em uma aplicação de **gerenciamento financeiro**, onde o usuário poderá:  
 
@@ -35,7 +35,7 @@ Este projeto consiste em uma aplicação de **gerenciamento financeiro**, onde o
 
 ---
 
-## 🚀 Como Executar o Projeto Localmente  
+## Como Executar o Projeto Localmente  
 
 1. Clone o repositório:  
 
@@ -82,7 +82,7 @@ export const storage = getStorage(app);
 npx expo start
 ```
 
-📱 O app pode ser testado em:  
+  O app pode ser testado em:  
 - **Expo Go** (Android/iOS)  
 - **Emulador Android**  
 - **Simulador iOS (apenas em macOS)**  
@@ -90,7 +90,7 @@ npx expo start
 
 ---
 
-## 🔐 Funcionalidades Implementadas  
+## Funcionalidades Implementadas  
 
 - ✅ **Login e Autenticação com Firebase** (Cadastro + Login + Logout)  
 - ✅ **Sessão persistente** → usuário permanece logado após refresh  
@@ -106,6 +106,11 @@ npx expo start
 
 ---
 
+### Demonstração do Projeto
+[Assista à apresentação completa no Google Drive](https://drive.google.com/file/d/1DptO--nbIQGsZ1KGTWbq7WicZyD-wh7y/view?usp=sharing)
+
+---
+
 ## Link do Design System
 
 ```bash
@@ -113,7 +118,7 @@ https://www.figma.com/design/ULceZeAR4otGhLXf684Tvo/P%C3%B3sTech-Fase3?node-id=0
 ```
 ---
 
-## 📹 Entrega Final  
+## Entrega Final  
 
 Além do código fonte, será entregue um **vídeo de até 5 minutos** demonstrando:  
 
@@ -125,7 +130,7 @@ Além do código fonte, será entregue um **vídeo de até 5 minutos** demonstra
 
 ---
 
-## 🧪 Tecnologias e Ferramentas  
+## Tecnologias e Ferramentas  
 
 - **React Native 0.79+ (Expo SDK)**  
 - **Expo Router** para navegação  
@@ -138,7 +143,7 @@ Além do código fonte, será entregue um **vídeo de até 5 minutos** demonstra
 
 ---
 
-## ⚙️ Scripts Principais  
+## Scripts Principais  
 
 ```bash
 # Instalar dependências
